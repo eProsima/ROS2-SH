@@ -1,1 +1,0 @@
-@plugin_library_extension@ : "@plugin_library_directory@/$<TARGET_FILE_NAME:@plugin_library_target@>"

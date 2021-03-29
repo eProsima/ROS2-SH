@@ -1,3 +1,0 @@
-[submodule "thirdparty/xtypes"]
-	path = thirdparty/xtypes
-	url = https://github.com/eProsima/xtypes.git
