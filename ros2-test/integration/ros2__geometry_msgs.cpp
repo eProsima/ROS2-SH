@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Open Source Robotics Foundation
+ * Copyright (C) 2020 - present Proyectos y Sistemas de Mantenimiento SL (eProsima).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +19,10 @@
 #include <rclcpp/node.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
 
-#include <soss/mock/api.hpp>
-#include <soss/Instance.hpp>
-#include <soss/utilities.hpp>
+#include <is/sh/mock/api.hpp>
+
+#include <is/core/Instance.hpp>
+#include <is/utils/Convert.hpp>
 
 #include <nav_msgs/srv/get_plan.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -29,8 +31,33 @@
 #include <gtest/gtest.h>
 
 #include <random>
+#include <sstream>
 
 // TODO (@jamoralp): re-think or refactor these tests.
+
+namespace is = eprosima::is;
+namespace xtypes = eprosima::xtypes;
+
+static is::utils::Logger logger("is::sh::ROS2::test::geometry_msgs");
+
+const std::string print_pose(
+        const geometry_msgs::msg::PoseStamped& ros2_pose)
+{
+    std::ostringstream oss;
+
+    oss << "{ position: {"
+        << " x: " << ros2_pose.pose.position.x << ","
+        << " y: " << ros2_pose.pose.position.y << ","
+        << " z: " << ros2_pose.pose.position.z
+        << " }, orientation: { "
+        << " w: " << ros2_pose.pose.orientation.w << ","
+        << " x: " << ros2_pose.pose.orientation.x << ","
+        << " y: " << ros2_pose.pose.orientation.y << ","
+        << " z: " << ros2_pose.pose.orientation.z
+        << " } }";
+
+    return oss.str();
+}
 
 geometry_msgs::msg::PoseStamped generate_random_pose(
         const int sec = 0)
@@ -53,6 +80,9 @@ geometry_msgs::msg::PoseStamped generate_random_pose(
 
     ros2_pose.header.frame_id = "map";
     ros2_pose.header.stamp.sec = sec;
+
+    logger << is::utils::Logger::Level::DEBUG
+           << "Generated random pose -> " << print_pose(ros2_pose) << std::endl;
 
     return ros2_pose;
 }
@@ -80,6 +110,7 @@ xtypes::DynamicData generate_plan_request_msg(
         const float tolerance = 1e-3f)
 {
     xtypes::DynamicData message(request_type);
+
     transform_pose_msg(goal, message["goal"]);
     transform_pose_msg(start, message["start"]);
     message["tolerance"] = tolerance;
@@ -87,12 +118,15 @@ xtypes::DynamicData generate_plan_request_msg(
     return message;
 }
 
-std::string print_header(
+const std::string print_header(
         const std_msgs::msg::Header& header)
 {
-    return "[stamp: " + std::to_string(header.stamp.sec) + " | "
-           + std::to_string(header.stamp.nanosec) + "] [frame_id: "
-           + std::to_string(header.stamp.sec) + "]";
+    std::ostringstream oss;
+
+    oss << "[stamp: " << header.stamp.sec << " | " << header.stamp.nanosec
+        << "] [frame_id: " << header.stamp.sec + "]";
+
+    return oss.str();
 }
 
 void compare_plans(
@@ -101,11 +135,19 @@ void compare_plans(
 {
     const bool header_matches = (plan_a.header == plan_b.header);
     EXPECT_TRUE(header_matches);
+
     if (!header_matches)
     {
-        std::cout << "Header A: " << print_header(plan_a.header)
-                  << "\nHeader B: " << print_header(plan_b.header)
-                  << std::endl;
+        logger << is::utils::Logger::Level::WARN
+               << "[compare_plans] Headers did not match:\n\t -- Header A: "
+               << print_header(plan_a.header) << "\n\t -- Header B: "
+               << print_header(plan_b.header) << std::endl;
+    }
+    else
+    {
+        logger << is::utils::Logger::Level::DEBUG
+               << "[compare_plans] Headers A and B matched: "
+               << print_header(plan_a.header) << std::endl;
     }
 
     ASSERT_EQ(plan_a.poses.size(), plan_b.poses.size());
@@ -113,21 +155,19 @@ void compare_plans(
     {
         const bool pose_matches = (plan_a.poses[i] == plan_b.poses[i]);
         EXPECT_TRUE(pose_matches);
+
         if (!pose_matches)
         {
-            std::cout << "Poses at index [" << i << "] did not match: ";
-            for (const auto& pose : {plan_a.poses[i], plan_b.poses[i]})
-            {
-                std::cout << "\n -- " << print_header(pose.header)
-                          << " [p: " << pose.pose.position.x
-                          << ", " << pose.pose.position.y
-                          << ", " << pose.pose.position.z
-                          << "] [q: " << pose.pose.orientation.w
-                          << ", " << pose.pose.orientation.x
-                          << ", " << pose.pose.orientation.y
-                          << ", " << pose.pose.orientation.z
-                          << "]" << std::endl;
-            }
+            logger << is::utils::Logger::Level::WARN
+                   << "[compare_plans] Poses at index [" << i << "]"
+                   << " did not match. Pose A is: " << print_pose(plan_a.poses[i])
+                   << ", and pose B is: " << print_pose(plan_b.poses[i]) << std::endl;
+        }
+        else
+        {
+            logger << is::utils::Logger::Level::DEBUG
+                   << "[compare_plans] Poses A and B matched: "
+                   << print_pose(plan_a.poses[i]) << std::endl;
         }
     }
 }
@@ -140,7 +180,7 @@ TEST(ROS2, Publish_subscribe_between_ros2_and_mock)
 
     YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__TEST_CONFIG);
 
-    soss::InstanceHandle handle = soss::run_instance(
+    is::core::InstanceHandle handle = is::run_instance(
         config_node, {ROS2__ROSIDL__BUILD_DIR});
 
     ASSERT_TRUE(handle);
@@ -176,7 +216,7 @@ TEST(ROS2, Publish_subscribe_between_ros2_and_mock)
                 mock_sub_value_received = true;
                 msg_promise.set_value(msg);
             };
-    ASSERT_TRUE(soss::mock::subscribe("transmit_pose", mock_sub));
+    ASSERT_TRUE(is::sh::mock::subscribe("transmit_pose", mock_sub));
 
     geometry_msgs::msg::Pose ros2_pose = generate_random_pose().pose;
 
@@ -249,14 +289,14 @@ TEST(ROS2, Publish_subscribe_between_ros2_and_mock)
     // Keep spinning and publishing while we wait for the promise to be
     // delivered. Try to cycle this for no more than a few seconds. If it's not
     // finished by that time, then something is probably broken with the test or
-    // with soss, and we should quit instead of waiting for the future and
+    // with Integratoion Service, and we should quit instead of waiting for the future and
     // potentially hanging forever.
     start_time = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - start_time < 30s)
     {
         executor.spin_some();
 
-        soss::mock::publish_message("echo_pose", received_msg);
+        is::sh::mock::publish_message("echo_pose", received_msg);
 
         executor.spin_some();
         if (pose_future.wait_for(100ms) == std::future_status::ready)
@@ -292,7 +332,7 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
 
     YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__TEST_CONFIG);
 
-    soss::InstanceHandle handle = soss::run_instance(
+    is::core::InstanceHandle handle = is::run_instance(
         config_node, {ROS2__ROSIDL__BUILD_DIR});
 
     ASSERT_TRUE(handle);
@@ -305,7 +345,7 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
     executor.add_node(ros2);
 
     // Get request type from ros2 middleware
-    const soss::TypeRegistry& ros2_types = *handle.type_registry("ros2");
+    const is::TypeRegistry& ros2_types = *handle.type_registry("ros2");
     const xtypes::DynamicType& request_type = *ros2_types.at("nav_msgs/GetPlan:request");
 
     // Create a plan
@@ -356,7 +396,7 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
         plan_response.plan.poses.front(),
         plan_response.plan.poses.back());
 
-    auto future_response_msg = soss::mock::request(
+    auto future_response_msg = is::sh::mock::request(
         "get_plan", request_msg);
 
     // Make sure that we got the expected request message
@@ -394,9 +434,10 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
 
     // TODO(MXG): We could copy the request message that gets passed to here and
     // compare it against the original request message that was sent. This would
-    // require implementing comparison operators for the soss::Message class.
+    // require implementing comparison operators for the DynamicData class.
+    // TODO (@jamoralp): These operators already exist for DynamicData. Investigate this.
     std::mutex serve_mutex;
-    soss::mock::serve("echo_plan", [&](const xtypes::DynamicData&)
+    is::sh::mock::serve("echo_plan", [&](const xtypes::DynamicData&)
             {
                 std::unique_lock<std::mutex> lock(serve_mutex);
                 return response_msg;
@@ -412,7 +453,7 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
 
     // Keep spinning while we wait for the promise to be delivered. Try to cycle
     // this for no more than a few seconds. If it's not finished by that time,
-    // then something is probably broken with the test or with soss, and we
+    // then something is probably broken with the test or with the Integration Service, and we
     // should quit instead of waiting for the future and potentially hanging
     // forever.
     start_time = std::chrono::steady_clock::now();

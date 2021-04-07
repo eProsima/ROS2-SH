@@ -1,0 +1,38 @@
+name: CI for Integration Service ROS 2 SystemHandle
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  ros2-sh_CI:
+    runs-on: ubuntu-20.04
+    container: ros:foxy
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: src/ros2-sh
+
+      - name: Download required dependencies
+        run: |
+          apt update
+          DEBIAN_FRONTEND=noninteractive apt install -y cmake gcc g++ git libboost-dev libboost-program-options-dev libyaml-cpp-dev
+
+      - name: Download the Integration Service Core
+        run: |
+          git clone -b bugfix/duplicate_convert_hpp --recursive https://github.com/eProsima/soss src/is-core
+
+      - name: Build
+        run: |
+          . /opt/ros/foxy/setup.sh
+          colcon build --packages-up-to is-ros2-test
+
+      - name: Test
+        run: |
+          . /opt/ros/foxy/setup.sh && . install/local_setup.sh && colcon test --packages-up-to is-ros2-test --event-handlers console_direct+
+          colcon test-result
