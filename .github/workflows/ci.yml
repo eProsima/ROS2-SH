@@ -25,7 +25,7 @@ jobs:
 
       - name: Download the Integration Service Core
         run: |
-          git clone -b bugfix/duplicate_convert_hpp --recursive https://github.com/eProsima/soss src/is-core
+          git clone -b feature/soss-core-to-is-core --recursive https://github.com/eProsima/soss src/is-core
 
       - name: Build
         run: |
