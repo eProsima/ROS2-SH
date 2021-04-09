@@ -1,8 +1,8 @@
-// generated from soss/packages/ros2/resources/convert__srv.cpp.em
+// generated from is-ros2/resources/convert_srv.cpp.em
 // generated code does not contain a copyright notice
 
 @#######################################################################
-@# EmPy template for generating soss/rosidl/ros2/<package>/src/srv/convert__srv__<srv>.cpp files
+@# EmPy template for generating is/rosidl/ros2/<package>/src/srv/convert__srv__<srv>.cpp files
 @#
 @# Context:
 @#  - spec (rosidl_parser.ServiceSpecification)
@@ -35,7 +35,7 @@ for type, msg in {"request": spec.request, "response": spec.response}.items():
         if field.type.is_primitive_type():
           continue
 
-        key = 'soss/rosidl/ros2/{}/msg/convert__msg__{}.hpp'.format(
+        key = 'is/rosidl/ros2/{}/msg/convert__msg__{}.hpp'.format(
             field.type.pkg_name, field.type.type)
         if key not in conversion_dependencies:
             conversion_dependencies[key] = set([])
@@ -48,28 +48,30 @@ alphabetical_response_fields = sorted(spec.response.fields, key=lambda x: x.name
 #include <stdexcept>
 
 // Include the header for the generic message type
-#include <soss/Message.hpp>
+// #include <is/core/Message.hpp>
 
 // Include the header for the conversions
-#include <soss/utilities.hpp>
+#include <is/utils/Convert.hpp>
 
 // Include the header for the concrete service type
 #include <@(ros2_srv_dependency)>
 
-// Include the headers for the soss message dependencies
+// Include the headers for the Integration Service message dependencies
 @[for key in sorted(conversion_dependencies.keys())]@
 #include <@(key)> // @(', '.join(conversion_dependencies[key]))
 @[end for]@
 
 // Include the Factory header so we can add this message type to the Factory
-#include <soss/ros2/Factory.hpp>
+#include <is/sh/ros2/Factory.hpp>
 
 // Include the Node API so we can provide and request services
 #include <rclcpp/node.hpp>
 
 #include <chrono>
 
-namespace soss {
+namespace eprosima {
+namespace is {
+namespace sh {
 namespace ros2 {
 namespace @(namespace_variable_srv) {
 
@@ -84,37 +86,39 @@ const std::string g_idl = R"~~~(
 )~~~";
 
 namespace {
-const xtypes::StructType& request_type() {
-  xtypes::idl::Context context;
-  context.allow_keyword_identifiers = true;
-  context.ignore_redefinition = true;
-  xtypes::idl::parse(g_idl, context);
-  if (!context.success)
-  {
-    throw std::runtime_error("Failed while parsing request type @(cpp_srv_type)_Request");
-  }
-  static xtypes::StructType type(context.module().structure("@(cpp_srv_type)_Request"));
-  type.name(g_request_name);
-  return type;
+const xtypes::StructType& request_type()
+{
+    xtypes::idl::Context context;
+    context.allow_keyword_identifiers = true;
+    context.ignore_redefinition = true;
+    xtypes::idl::parse(g_idl, context);
+    if (!context.success)
+    {
+        throw std::runtime_error("Failed while parsing request type @(cpp_srv_type)_Request");
+    }
+    static xtypes::StructType type(context.module().structure("@(cpp_srv_type)_Request"));
+    type.name(g_request_name);
+    return type;
 }
 
-TypeFactoryRegistrar register_request_type(g_request_name, &request_type);
+TypeToFactoryRegistrar register_request_type(g_request_name, &request_type);
 
-const xtypes::StructType& response_type() {
-  xtypes::idl::Context context;
-  context.allow_keyword_identifiers = true;
-  context.ignore_redefinition = true;
-  xtypes::idl::parse(g_idl, context);
-  if (!context.success)
-  {
-    throw std::runtime_error("Failed while parsing response type @(cpp_srv_type)_Response");
-  }
-  static xtypes::StructType type(context.module().structure("@(cpp_srv_type)_Response"));
-  type.name(g_response_name);
-  return type;
+const xtypes::StructType& response_type()
+{
+    xtypes::idl::Context context;
+    context.allow_keyword_identifiers = true;
+    context.ignore_redefinition = true;
+    xtypes::idl::parse(g_idl, context);
+    if (!context.success)
+    {
+        throw std::runtime_error("Failed while parsing response type @(cpp_srv_type)_Response");
+    }
+    static xtypes::StructType type(context.module().structure("@(cpp_srv_type)_Response"));
+    type.name(g_response_name);
+    return type;
 }
 
-TypeFactoryRegistrar register_response_type(g_response_name, &response_type);
+TypeToFactoryRegistrar register_response_type(g_response_name, &response_type);
 } // anonymous namespace
 
 
@@ -122,222 +126,228 @@ TypeFactoryRegistrar register_response_type(g_response_name, &response_type);
 void request_to_ros2(const xtypes::ReadableDynamicDataRef& from, Ros2_Request& to)
 {
 @[for field in alphabetical_request_fields]@
-  soss::Convert<Ros2_Request::_@(field.name)_type>::from_xtype_field(from["@(field.name)"], to.@(field.name));
+    utils::Convert<Ros2_Request::_@(field.name)_type>::from_xtype_field(from["@(field.name)"], to.@(field.name));
 @[end for]@
 
-  // Suppress possible unused variable warnings
-  (void)from;
-  (void)to;
+    // Suppress possible unused variable warnings
+    (void)from;
+    (void)to;
 }
 
 //==============================================================================
 void request_to_xtype(const Ros2_Request& from, xtypes::WritableDynamicDataRef to)
 {
 @[for field in alphabetical_request_fields]@
-  soss::Convert<Ros2_Request::_@(field.name)_type>::to_xtype_field(from.@(field.name), to["@(field.name)"]);
+    utils::Convert<Ros2_Request::_@(field.name)_type>::to_xtype_field(from.@(field.name), to["@(field.name)"]);
 @[end for]@
 
-  // Suppress possible unused variable warnings
-  (void)from;
-  (void)to;
+    // Suppress possible unused variable warnings
+    (void)from;
+    (void)to;
 }
 
 //==============================================================================
 void response_to_ros2(const xtypes::ReadableDynamicDataRef& from, Ros2_Response& to)
 {
 @[for field in alphabetical_response_fields]@
-  soss::Convert<Ros2_Response::_@(field.name)_type>::from_xtype_field(from["@(field.name)"], to.@(field.name));
+    utils::Convert<Ros2_Response::_@(field.name)_type>::from_xtype_field(from["@(field.name)"], to.@(field.name));
 @[end for]@
 
-  // Suppress possible unused variable warnings
-  (void)from;
-  (void)to;
+    // Suppress possible unused variable warnings
+    (void)from;
+    (void)to;
 }
 
 //==============================================================================
 void response_to_xtype(const Ros2_Response& from, xtypes::WritableDynamicDataRef to)
 {
 @[for field in alphabetical_response_fields]@
-  soss::Convert<Ros2_Response::_@(field.name)_type>::to_xtype_field(from.@(field.name), to["@(field.name)"]);
+    utils::Convert<Ros2_Response::_@(field.name)_type>::to_xtype_field(from.@(field.name), to["@(field.name)"]);
 @[end for]@
 
-  // Suppress possible unused variable warnings
-  (void)from;
-  (void)to;
+    // Suppress possible unused variable warnings
+    (void)from;
+    (void)to;
 }
 
 //==============================================================================
-class ClientProxy final : public virtual soss::ServiceClient
+class ClientProxy final : public virtual is::ServiceClient
 {
 public:
 
-  ClientProxy(
-      rclcpp::Node& node,
-      const std::string& service_name,
-      const ServiceClientSystem::RequestCallback& callback,
-      const rmw_qos_profile_t& qos_profile)
-    : _callback(callback),
-      _handle(std::make_shared<PromiseHolder>()),
-      _request_data(request_type())
-  {
-    _service = node.create_service<Ros2_Srv>(
-          service_name,
-          [=](const std::shared_ptr<rmw_request_id_t> request_header,
-              const std::shared_ptr<Ros2_Request> request,
-              const std::shared_ptr<Ros2_Response> response)
-              { this->service_callback(request_header, request, response); },
-          qos_profile);
-  }
+    ClientProxy(
+            rclcpp::Node& node,
+            const std::string& service_name,
+            const ServiceClientSystem::RequestCallback& callback,
+            const rmw_qos_profile_t& qos_profile)
+        : _callback(callback)
+        , _handle(std::make_shared<PromiseHolder>())
+        , _request_data(request_type())
+    {
+        _service = node.create_service<Ros2_Srv>(
+            service_name,
+            [=](const std::shared_ptr<rmw_request_id_t> request_header,
+                const std::shared_ptr<Ros2_Request> request,
+                const std::shared_ptr<Ros2_Response> response)
+                {
+                    this->service_callback(request_header, request, response);
+                },
+            qos_profile);
+    }
 
-  void receive_response(
-      std::shared_ptr<void> call_handle,
-      const xtypes::DynamicData& result) override
-  {
-    const std::shared_ptr<PromiseHolder>& handle =
-        std::static_pointer_cast<PromiseHolder>(call_handle);
+    void receive_response(
+            std::shared_ptr<void> call_handle,
+            const xtypes::DynamicData& result) override
+    {
+        const std::shared_ptr<PromiseHolder>& handle =
+            std::static_pointer_cast<PromiseHolder>(call_handle);
 
-    response_to_ros2(result, _response);
-    handle->promise->set_value(_response);
-  }
+        response_to_ros2(result, _response);
+        handle->promise->set_value(_response);
+    }
 
 private:
 
-  void service_callback(
-      const std::shared_ptr<rmw_request_id_t>&, //request_header
-      const std::shared_ptr<Ros2_Request>& request,
-      const std::shared_ptr<Ros2_Response>& response)
-  {
-    request_to_xtype(*request, _request_data);
-
-    std::promise<Ros2_Response> response_promise;
-    _handle->promise = &response_promise;
-
-    std::future<Ros2_Response> future_response = response_promise.get_future();
-    _callback(_request_data, *this, _handle);
-
-    if (std::future_status::ready == future_response.wait_for(std::chrono::milliseconds(5000))) // TODO: Make waiting time configurable.
+    void service_callback(
+            const std::shared_ptr<rmw_request_id_t>&, //request_header
+            const std::shared_ptr<Ros2_Request>& request,
+            const std::shared_ptr<Ros2_Response>& response)
     {
-      *response = future_response.get();
+        request_to_xtype(*request, _request_data);
+
+        std::promise<Ros2_Response> response_promise;
+        _handle->promise = &response_promise;
+
+        std::future<Ros2_Response> future_response = response_promise.get_future();
+        _callback(_request_data, *this, _handle);
+
+        if (std::future_status::ready == future_response.wait_for(std::chrono::milliseconds(5000))) // TODO: Make waiting time configurable.
+        {
+            *response = future_response.get();
+        }
+        else
+        {
+            std::cout << "Request timeout." << std::endl;
+        }
     }
-    else
+
+    struct PromiseHolder
     {
-      std::cout << "Request timeout." << std::endl;
-    }
-  }
+        std::promise<Ros2_Response>* promise;
+    };
 
-  struct PromiseHolder
-  {
-    std::promise<Ros2_Response>* promise;
-  };
-
-  const ServiceClientSystem::RequestCallback _callback;
-  const std::shared_ptr<PromiseHolder> _handle;
-  xtypes::DynamicData _request_data;
-  Ros2_Response _response;
-  rclcpp::Service<Ros2_Srv>::SharedPtr _service;
-
+    const ServiceClientSystem::RequestCallback _callback;
+    const std::shared_ptr<PromiseHolder> _handle;
+    xtypes::DynamicData _request_data;
+    Ros2_Response _response;
+    rclcpp::Service<Ros2_Srv>::SharedPtr _service;
 };
 
 //==============================================================================
-std::shared_ptr<soss::ServiceClient> make_client(
-    rclcpp::Node& node,
-    const std::string& service_name,
-    const ServiceClientSystem::RequestCallback& callback,
-    const rmw_qos_profile_t& qos_profile)
+std::shared_ptr<is::ServiceClient> make_client(
+        rclcpp::Node& node,
+        const std::string& service_name,
+        const ServiceClientSystem::RequestCallback& callback,
+        const rmw_qos_profile_t& qos_profile)
 {
-  return std::make_shared<ClientProxy>(node, service_name, callback, qos_profile);
+    return std::make_shared<ClientProxy>(node, service_name, callback, qos_profile);
 }
 
 namespace {
-ServiceClientFactoryRegistrar register_client(g_response_name, &make_client);
+ServiceClientToFactoryRegistrar register_client(g_response_name, &make_client);
 } // anonymous namespace
 
 //==============================================================================
-xtypes::DynamicData initialize_response() {
-  return xtypes::DynamicData(response_type());
+xtypes::DynamicData initialize_response()
+{
+    return xtypes::DynamicData(response_type());
 }
-class ServerProxy final : public virtual soss::ServiceProvider
+
+class ServerProxy final : public virtual is::ServiceProvider
 {
 public:
 
-  ServerProxy(
-      rclcpp::Node& node,
-      const std::string& service_name,
-      const rmw_qos_profile_t& qos_profile)
-    : _service_name(service_name),
-      _request_pool(1),
-      _response_pool(1)
-  {
-    _ros2_client = node.create_client<Ros2_Srv>(service_name, qos_profile);
-  }
-
-  void call_service(
-      const xtypes::DynamicData& request,
-      ServiceClient& soss_client,
-      std::shared_ptr<void> call_handle) override
-  {
-    if (!_ros2_client->wait_for_service(std::chrono::milliseconds(10)))
+    ServerProxy(
+            rclcpp::Node& node,
+            const std::string& service_name,
+            const rmw_qos_profile_t& qos_profile)
+        : _service_name(service_name)
+        , _request_pool(1)
+        , _response_pool(1)
     {
-      return;
+        _ros2_client = node.create_client<Ros2_Srv>(service_name, qos_profile);
     }
 
-    // This helps the lambda to value-capture the address of the soss client.
-    // TODO(MXG): Would it be dangerous for the lambda to reference-capture the
-    // soss client? The lambda might be called after this reference has left
-    // scope, so when a lambda does a reference-capture of a reference, does it
-    // require the reference to stay alive or does it only require the
-    // referred-to object to stay alive? For now we'll use this value-capture
-    // technique since it's sure to be safe.
-    ServiceClient* const ptr_to_soss_client = &soss_client;
+    void call_service(
+            const xtypes::DynamicData& request,
+            ServiceClient& is_client,
+            std::shared_ptr<void> call_handle) override
+    {
+        if (!_ros2_client->wait_for_service(std::chrono::milliseconds(10)))
+        {
+            return;
+        }
 
-    Ros2_Request::SharedPtr ros2_request = _request_pool.pop();
-    request_to_ros2(request, *ros2_request);
-    _ros2_client->async_send_request(
-          ros2_request,
-          [=](const rclcpp::Client<Ros2_Srv>::SharedFuture future_response)
-          { this->_wait_for_response(*ptr_to_soss_client, std::move(call_handle), future_response, ros2_request); });
-  }
+        // This helps the lambda to value-capture the address of the Integration Service client.
+        // TODO(MXG): Would it be dangerous for the lambda to reference-capture the
+        // Integration Service client? The lambda might be called after this reference has left
+        // scope, so when a lambda does a reference-capture of a reference, does it
+        // require the reference to stay alive or does it only require the
+        // referred-to object to stay alive? For now we'll use this value-capture
+        // technique since it's sure to be safe.
+        ServiceClient* const ptr_to_is_client = &is_client;
+
+        Ros2_Request::SharedPtr ros2_request = _request_pool.pop();
+        request_to_ros2(request, *ros2_request);
+        _ros2_client->async_send_request(
+            ros2_request,
+            [=](const rclcpp::Client<Ros2_Srv>::SharedFuture future_response)
+            {
+                this->_wait_for_response(*ptr_to_is_client, std::move(call_handle), future_response, ros2_request);
+            });
+    }
 
 private:
 
-  void _wait_for_response(
-      ServiceClient& soss_client,
-      std::shared_ptr<void> call_handle,
-      const rclcpp::Client<Ros2_Srv>::SharedFuture& future_response,
-      Ros2_Request::SharedPtr used_request)
-  {
-    future_response.wait();
+    void _wait_for_response(
+            ServiceClient& is_client,
+            std::shared_ptr<void> call_handle,
+            const rclcpp::Client<Ros2_Srv>::SharedFuture& future_response,
+            Ros2_Request::SharedPtr used_request)
+    {
+        future_response.wait();
 
-    const Ros2_Response::SharedPtr& response = future_response.get();
-    xtypes::DynamicData soss_response = _response_pool.pop();
-    response_to_xtype(*response, soss_response);
+        const Ros2_Response::SharedPtr& response = future_response.get();
+        xtypes::DynamicData is_response = _response_pool.pop();
+        response_to_xtype(*response, is_response);
 
-    soss_client.receive_response(std::move(call_handle), soss_response);
+        is_client.receive_response(std::move(call_handle), is_response);
 
-    _response_pool.recycle(std::move(soss_response));
-    _request_pool.recycle(std::move(used_request));
-  }
+        _response_pool.recycle(std::move(is_response));
+        _request_pool.recycle(std::move(used_request));
+    }
 
-  const std::string _service_name;
-  soss::SharedResourcePool<Ros2_Request> _request_pool;
-  soss::ResourcePool<xtypes::DynamicData, &initialize_response> _response_pool;
-  rclcpp::Client<Ros2_Srv>::SharedPtr _ros2_client;
-
+    const std::string _service_name;
+    utils::SharedResourcePool<Ros2_Request> _request_pool;
+    utils::ResourcePool<xtypes::DynamicData, &initialize_response> _response_pool;
+    rclcpp::Client<Ros2_Srv>::SharedPtr _ros2_client;
 };
 
 //==============================================================================
-std::shared_ptr<soss::ServiceProvider> make_server(
-    rclcpp::Node& node,
-    const std::string& service_name,
-    const rmw_qos_profile_t& qos_profile)
+std::shared_ptr<is::ServiceProvider> make_server(
+        rclcpp::Node& node,
+        const std::string& service_name,
+        const rmw_qos_profile_t& qos_profile)
 {
-  return std::make_shared<ServerProxy>(node, service_name, qos_profile);
+    return std::make_shared<ServerProxy>(node, service_name, qos_profile);
 }
 
 namespace {
-ServiceProviderFactoryRegistrar register_server(g_request_name, &make_server);
+ServiceProviderToFactoryRegistrar register_server(g_request_name, &make_server);
 }
 
-} // namespace @(namespace_variable_srv)
-} // namespace ros2
-} // namespace soss
+} //  namespace @(namespace_variable_srv)
+} //  namespace ros2
+} //  namespace sh
+} //  namespace is
+} //  namespace eprosima

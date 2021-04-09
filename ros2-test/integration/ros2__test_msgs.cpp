@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Open Source Robotics Foundation
+ * Copyright (C) 2020 - present Proyectos y Sistemas de Mantenimiento SL (eProsima).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +19,9 @@
 #include <rclcpp/node.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
 
-#include <soss/mock/api.hpp>
-#include <soss/Instance.hpp>
-#include <soss/utilities.hpp>
+#include <is/sh/mock/api.hpp>
+#include <is/core/Instance.hpp>
+#include <is/utils/Convert.hpp>
 
 #include <yaml-cpp/yaml.h>
 
@@ -28,8 +29,14 @@
 
 #include <random>
 
-#include <soss_ros2_test_msg/msg/bounded_array_nested.hpp>
-#define ROS2_TYPE_NAME "soss_ros2_test_msg/BoundedArrayNested"
+#include <is_ros2_test_msg/msg/bounded_array_nested.hpp>
+
+#define ROS2_TYPE_NAME "is_ros2_test_msg/BoundedArrayNested"
+
+namespace is = eprosima::is;
+namespace xtypes = eprosima::xtypes;
+
+static is::utils::Logger logger("is::sh::ROS2::test::test_msgs");
 
 template<typename Ros2Primitives>
 Ros2Primitives generate_random_primitives(
@@ -69,24 +76,24 @@ xtypes::DynamicData generate_random_primitives_msg(
 {
     const Ros2Primitives ros2_primitives = generate_random_primitives<Ros2Primitives>(seed);
     xtypes::DynamicData xtypes_primitives(type);
-#define SOSS_SET_FIELD(field_name) \
-    soss::Convert<typename Ros2Primitives::_ ## field_name ## _type>::to_xtype_field(ros2_primitives.field_name, \
+#define TO_XTYPES_SET_FIELD(field_name) \
+    is::utils::Convert<typename Ros2Primitives::_ ## field_name ## _type>::to_xtype_field(ros2_primitives.field_name, \
             xtypes_primitives[#field_name]); \
 
-    SOSS_SET_FIELD(bool_value);
-    SOSS_SET_FIELD(byte_value);
-    SOSS_SET_FIELD(char_value);
-    SOSS_SET_FIELD(int8_value);
-    SOSS_SET_FIELD(int16_value);
-    SOSS_SET_FIELD(int32_value);
-    SOSS_SET_FIELD(int64_value);
-    SOSS_SET_FIELD(uint8_value);
-    SOSS_SET_FIELD(uint16_value);
-    SOSS_SET_FIELD(uint32_value);
-    SOSS_SET_FIELD(uint64_value);
-    SOSS_SET_FIELD(float32_value);
-    SOSS_SET_FIELD(float64_value);
-    SOSS_SET_FIELD(string_value);
+    TO_XTYPES_SET_FIELD(bool_value);
+    TO_XTYPES_SET_FIELD(byte_value);
+    TO_XTYPES_SET_FIELD(char_value);
+    TO_XTYPES_SET_FIELD(int8_value);
+    TO_XTYPES_SET_FIELD(int16_value);
+    TO_XTYPES_SET_FIELD(int32_value);
+    TO_XTYPES_SET_FIELD(int64_value);
+    TO_XTYPES_SET_FIELD(uint8_value);
+    TO_XTYPES_SET_FIELD(uint16_value);
+    TO_XTYPES_SET_FIELD(uint32_value);
+    TO_XTYPES_SET_FIELD(uint64_value);
+    TO_XTYPES_SET_FIELD(float32_value);
+    TO_XTYPES_SET_FIELD(float64_value);
+    TO_XTYPES_SET_FIELD(string_value);
 
     return xtypes_primitives;
 }
@@ -135,7 +142,7 @@ void test(
                 is_msg_received = true;
                 msg_promise.set_value(msg);
             };
-    ASSERT_TRUE(soss::mock::subscribe("transmit", mock_sub));
+    ASSERT_TRUE(is::sh::mock::subscribe("transmit", mock_sub));
 
     const std::size_t N = 3;
     Ros2Array ros2_msg = generate_random_array<Ros2Array, Ros2Primitives>(N);
@@ -146,7 +153,7 @@ void test(
 
     // Keep spinning while we wait for the promise to be delivered. Try cycle
     // this for no more than a few seconds. If it's not finished by that time,
-    // then something is probably broken with the test or with soss, and we
+    // then something is probably broken with the test or with the Integration Service, and we
     // should quit instead of waiting for the future and potentially hanging
     // forever.
     auto start_time = std::chrono::steady_clock::now();
@@ -175,27 +182,27 @@ void test(
         xtypes::ReadableDynamicDataRef xtypes_primitives = seq[i];
         const Ros2Primitives& ros2_primitives = ros2_msg.primitive_values[i];
 
-    #define SOSS_REQUIRE_AND_COMPARE(field_name) { \
+    #define CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(field_name) { \
         typename Ros2Primitives::_ ## field_name ## _type ros2_field; \
-        soss::Convert<typename Ros2Primitives::_ ## field_name ## _type>::from_xtype_field( \
+        is::utils::Convert<typename Ros2Primitives::_ ## field_name ## _type>::from_xtype_field( \
             xtypes_primitives[#field_name], ros2_field); \
         EXPECT_EQ(ros2_field, ros2_primitives.field_name); \
-    }
+}
 
-        SOSS_REQUIRE_AND_COMPARE(bool_value);
-        SOSS_REQUIRE_AND_COMPARE(byte_value);
-        SOSS_REQUIRE_AND_COMPARE(char_value);
-        SOSS_REQUIRE_AND_COMPARE(int8_value);
-        SOSS_REQUIRE_AND_COMPARE(int16_value);
-        SOSS_REQUIRE_AND_COMPARE(int32_value);
-        SOSS_REQUIRE_AND_COMPARE(int64_value);
-        SOSS_REQUIRE_AND_COMPARE(uint8_value);
-        SOSS_REQUIRE_AND_COMPARE(uint16_value);
-        SOSS_REQUIRE_AND_COMPARE(uint32_value);
-        SOSS_REQUIRE_AND_COMPARE(uint64_value);
-        SOSS_REQUIRE_AND_COMPARE(string_value);
-        SOSS_REQUIRE_AND_COMPARE(float32_value);
-        SOSS_REQUIRE_AND_COMPARE(float64_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(bool_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(byte_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(char_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(int8_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(int16_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(int32_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(int64_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(uint8_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(uint16_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(uint32_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(uint64_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(string_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(float32_value);
+        CONVERT_FROM_XTYPES_REQUIRE_AND_COMPARE(float64_value);
     }
 
     const std::size_t M = ros2_msg.primitive_values.max_size();
@@ -235,14 +242,14 @@ void test(
     // Keep spinning and publishing while we wait for the promise to be
     // delivered. Try cycle this for no more than a few seconds. If it's not
     // finished by that time, then something is probably broken with the test or
-    // with soss, and we should quit instead of waiting for the future and
+    // with the Integration Service, and we should quit instead of waiting for the future and
     // potentially hanging forever.
     start_time = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - start_time < 30s)
     {
         executor.spin_node_some(ros2);
 
-        soss::mock::publish_message("echo", received_msg);
+        is::sh::mock::publish_message("echo", received_msg);
 
         executor.spin_node_some(ros2);
         if (array_future.wait_for(100ms) == std::future_status::ready)
@@ -269,7 +276,7 @@ TEST(ROS2, Transmit_and_receive_all_test_messages)
 
     YAML::Node config_node = YAML::LoadFile(ROS2__TEST_MSGS__TEST_CONFIG);
 
-    soss::InstanceHandle handle = soss::run_instance(
+    is::core::InstanceHandle handle = is::run_instance(
         config_node, {ROS2__ROSIDL__BUILD_DIR});
 
     ASSERT_TRUE(handle);
@@ -279,7 +286,7 @@ TEST(ROS2, Transmit_and_receive_all_test_messages)
 
     ASSERT_TRUE( rclcpp::ok() );
 
-    test<soss_ros2_test_msg::msg::BoundedArrayNested, soss_ros2_test_msg::msg::Primitives>(ros2, executor);
+    test<is_ros2_test_msg::msg::BoundedArrayNested, is_ros2_test_msg::msg::Primitives>(ros2, executor);
 
     // Quit and wait for no more than a minute. We don't want the test to get
     // hung here indefinitely in the case of an error.

@@ -1,5 +1,6 @@
 ﻿/*
  * Copyright (C) 2018 Open Source Robotics Foundation
+ * Copyright (C) 2020 - present Proyectos y Sistemas de Mantenimiento SL (eProsima).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +23,8 @@
 
 #include <rcl/logging.h>
 
-#include <soss/Instance.hpp>
-#include <soss/utilities.hpp>
+#include <is/core/Instance.hpp>
+#include <is/utils/Convert.hpp>
 
 #include <std_msgs/msg/string.hpp>
 
@@ -34,6 +35,11 @@
 
 constexpr const char* DOMAIN_ID_1 = "5";
 constexpr const char* DOMAIN_ID_2 = "10";
+
+namespace is = eprosima::is;
+namespace xtypes = eprosima::xtypes;
+
+static is::utils::Logger logger("is::sh::ROS2::test::test_domain");
 
 #ifdef WIN32
 #define SETENV(id, value, b) \
@@ -48,7 +54,7 @@ constexpr const char* DOMAIN_ID_2 = "10";
 
 TEST(ROS2, Change_ROS2_Domain_id)
 {
-    char const* const argv[1] = {"soss"};
+    char const* const argv[1] = {"is_ros2_test_domain_id"};
     if (!rclcpp::ok())
     {
         rclcpp::init(1, argv);
@@ -66,7 +72,7 @@ TEST(ROS2, Change_ROS2_Domain_id)
         init_options_1.auto_initialize_logging(false);
     }
 
-    const char* const argv_1[1] = {"soss_context_1"};
+    const char* const argv_1[1] = {"is_ros2_test_domain_id_context_1"};
     auto context_1 = std::make_shared<rclcpp::Context>();
     context_1->init(1, argv_1, init_options_1);
 
@@ -88,7 +94,7 @@ TEST(ROS2, Change_ROS2_Domain_id)
         init_options_2.auto_initialize_logging(false);
     }
 
-    const char* const argv_2[1] = {"soss_context_2"};
+    const char* const argv_2[1] = {"is_ros2_test_domain_id_context_2"};
     auto context_2 = std::make_shared<rclcpp::Context>();
     context_2->init(1, argv_2);
 
@@ -102,10 +108,22 @@ TEST(ROS2, Change_ROS2_Domain_id)
 
     UNSETENV("ROS_DOMAIN_ID");
 
-    std::cout << "[soss-ros2-test] Domain ID for 'node1': "
-              << rcl_node_ops_1->domain_id << std::endl;
-    std::cout << "[soss-ros2-test] Domain ID for 'node2': "
-              << rcl_node_ops_2->domain_id << std::endl;
+    // Check correct DOMAIN ID for node_1 and node_2
+# define CHECK_DOMAIN_ID(NODE_OPS, DOMAIN_ID) \
+    { \
+        std::stringstream ss(DOMAIN_ID); \
+        size_t domain_id; \
+        ss >> domain_id; \
+        ASSERT_EQ(NODE_OPS->domain_id, domain_id); \
+    }
+
+    CHECK_DOMAIN_ID(rcl_node_ops_1, DOMAIN_ID_1);
+    logger << is::utils::Logger::Level::INFO
+           << "Domain ID for 'node_1': " << rcl_node_ops_1->domain_id << std::endl;
+
+    CHECK_DOMAIN_ID(rcl_node_ops_2, DOMAIN_ID_2);
+    logger << is::utils::Logger::Level::INFO
+           << "Domain ID for 'node_2': " << rcl_node_ops_2->domain_id << std::endl;
 
     const std::string topic_name("string_topic");
 
@@ -149,15 +167,15 @@ TEST(ROS2, Change_ROS2_Domain_id)
     // In different domains the message should not be received
     ASSERT_NE(msg_future.wait_for(0s), std::future_status::ready);
 
-    // Run soss in order to make the communication possible.
+    // Run the Integration Service in order to make the communication possible.
     YAML::Node config_node = YAML::LoadFile(ROS2__TEST_DOMAIN__TEST_CONFIG);
 
-    soss::InstanceHandle handle = soss::run_instance(
+    is::core::InstanceHandle handle = is::run_instance(
         config_node, { ROS2__ROSIDL__BUILD_DIR });
 
     ASSERT_TRUE(handle);
 
-    // Wait for soss to start properly before publishing.
+    // Wait for the Integration Service to start properly before publishing.
     std::this_thread::sleep_for(1s);
     publisher->publish(pub_msg);
     executor.spin_node_some(node_1);
