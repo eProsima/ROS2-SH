@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _IS_SH_ROS2_INTERNAL_SYSTEMHANDLE_HPP_
-#define _IS_SH_ROS2_INTERNAL_SYSTEMHANDLE_HPP_
+#ifndef _IS_SH_ROS2__INTERNAL__SYSTEMHANDLE_HPP_
+#define _IS_SH_ROS2__INTERNAL__SYSTEMHANDLE_HPP_
 
 #include <is/systemhandle/SystemHandle.hpp>
 

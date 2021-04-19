@@ -18,6 +18,8 @@
 
 #include <is/sh/ros2/Factory.hpp>
 
+#include <is/utils/Log.hpp>
+
 #include <unordered_map>
 
 namespace eprosima {
@@ -30,11 +32,16 @@ class Factory::Implementation
 {
 public:
 
-    void register_type_factory(
-            const std::string& message_type,
-            RegisterTypeToFactory type_factory)
+    Implementation()
+        : logger_("is::sh::ROS2::Factory")
     {
-        _type_factories[message_type] = std::move(type_factory);
+    }
+
+    void register_type_factory(
+            const std::string& type_name,
+            RegisterTypeToFactory register_type_func)
+    {
+        _type_factories[type_name] = std::move(register_type_func);
     }
 
     xtypes::DynamicType::Ptr create_type(
@@ -43,6 +50,10 @@ public:
         auto it = _type_factories.find(type_name);
         if (it == _type_factories.end())
         {
+            logger_ << utils::Logger::Level::ERROR
+                    << "'create_type' could not find a factory type named '"
+                    << type_name << "' to create!" << std::endl;
+
             return xtypes::DynamicType::Ptr();
         }
 
@@ -50,10 +61,10 @@ public:
     }
 
     void register_subscription_factory(
-            const std::string& topic_name,
+            const std::string& topic_type,
             RegisterSubscriptionToFactory register_sub_func)
     {
-        _subscription_factories[topic_name] = std::move(register_sub_func);
+        _subscription_factories[topic_type] = std::move(register_sub_func);
     }
 
     std::shared_ptr<void> create_subscription(
@@ -66,6 +77,10 @@ public:
         auto it = _subscription_factories.find(topic_type.name());
         if (it == _subscription_factories.end())
         {
+            logger_ << utils::Logger::Level::ERROR
+                    << "create_subscription' could not find a message type named '"
+                    << topic_type.name() << "' to load!" << std::endl;
+
             return nullptr;
         }
 
@@ -88,6 +103,10 @@ public:
         auto it = _publisher_factories.find(topic_type.name());
         if (it == _publisher_factories.end())
         {
+            logger_ << utils::Logger::Level::ERROR
+                    << "'create_publisher': could not find a message type named '"
+                    << topic_type.name() << "' to load!" << std::endl;
+
             return nullptr;
         }
 
@@ -111,6 +130,10 @@ public:
         auto it = _client_proxy_factories.find(service_response_type);
         if (it == _client_proxy_factories.end())
         {
+            logger_ << utils::Logger::Level::ERROR
+                    << "'create_client_proxy': could not find a service type named '"
+                    << service_response_type << "' to load!" << std::endl;
+
             return nullptr;
         }
 
@@ -119,12 +142,11 @@ public:
 
     void register_server_proxy_factory(
             const std::string& service_request_type,
-            ServiceProviderToFactory register_service_server_func)
+            RegisterServiceProviderToFactory register_service_server_func)
     {
         _server_proxy_factories[service_request_type] = register_service_server_func;
     }
 
-    //============================================================================
     std::shared_ptr<ServiceProvider> create_server_proxy(
             const std::string& service_request_type,
             rclcpp::Node& node,
@@ -134,6 +156,10 @@ public:
         auto it = _server_proxy_factories.find(service_request_type);
         if (it == _server_proxy_factories.end())
         {
+            logger_ << utils::Logger::Level::ERROR
+                    << "'create_server_proxy': could not find a service type named '"
+                    << service_request_type << "' to load!" << std::endl;
+
             return nullptr;
         }
 
@@ -146,7 +172,9 @@ private:
     std::unordered_map<std::string, RegisterSubscriptionToFactory> _subscription_factories;
     std::unordered_map<std::string, RegisterPublisherToFactory> _publisher_factories;
     std::unordered_map<std::string, RegisterServiceClientToFactory> _client_proxy_factories;
-    std::unordered_map<std::string, ServiceProviderToFactory> _server_proxy_factories;
+    std::unordered_map<std::string, RegisterServiceProviderToFactory> _server_proxy_factories;
+
+    utils::Logger logger_;
 };
 
 //==============================================================================
@@ -237,7 +265,7 @@ std::shared_ptr<ServiceClient> Factory::create_client_proxy(
 //==============================================================================
 void Factory::register_server_proxy_factory(
         const std::string& service_request_type,
-        ServiceProviderToFactory register_service_server_func)
+        RegisterServiceProviderToFactory register_service_server_func)
 {
     _pimpl->register_server_proxy_factory(
         service_request_type, std::move(register_service_server_func));
