@@ -114,7 +114,7 @@ public:
                         rclcpp::Node& node,
                         const std::string& topic_name,
                         const xtypes::DynamicType& message_type,
-                        TopicSubscriberSystem::SubscriptionCallback callback,
+                        TopicSubscriberSystem::SubscriptionCallback* callback,
                         const rmw_qos_profile_t& qos_profile)>;
 
     /**
@@ -149,7 +149,7 @@ public:
             const xtypes::DynamicType& topic_type,
             rclcpp::Node& node,
             const std::string& topic_name,
-            TopicSubscriberSystem::SubscriptionCallback callback,
+            TopicSubscriberSystem::SubscriptionCallback* callback,
             const rmw_qos_profile_t& qos_profile);
 
     /**
@@ -218,7 +218,7 @@ public:
             std::function<std::shared_ptr<ServiceClient>(
                         rclcpp::Node& node,
                         const std::string& service_name,
-                        const ServiceClientSystem::RequestCallback& callback,
+                        ServiceClientSystem::RequestCallback* callback,
                         const rmw_qos_profile_t& qos_profile)>;
 
     /**
@@ -255,7 +255,7 @@ public:
             const std::string& service_response_type,
             rclcpp::Node& node,
             const std::string& service_name,
-            const ServiceClientSystem::RequestCallback& callback,
+            ServiceClientSystem::RequestCallback* callback,
             const rmw_qos_profile_t& qos_profile);
 
     /**

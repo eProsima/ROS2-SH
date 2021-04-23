@@ -52,11 +52,11 @@ public:
 
     Subscription(
             rclcpp::Node& node,
-            TopicSubscriberSystem::SubscriptionCallback callback,
+            TopicSubscriberSystem::SubscriptionCallback* callback,
             const std::string& topic_name,
             const xtypes::DynamicType& message_type,
             const rmw_qos_profile_t& qos_profile)
-        : _callback(std::move(callback))
+        : _callback(callback)
         , _message_type(message_type)
     {
 
@@ -86,11 +86,11 @@ private:
     {
         xtypes::DynamicData data(_message_type);
         convert_to_xtype(msg, data);
-        _callback(data);
+        (*_callback)(data);
     }
 
     // Save the callback that we were given by the is-ros2 plugin
-    TopicSubscriberSystem::SubscriptionCallback _callback;
+    TopicSubscriberSystem::SubscriptionCallback* _callback;
 
     const xtypes::DynamicType& _message_type;
 
@@ -105,11 +105,11 @@ std::shared_ptr<void> subscribe(
         rclcpp::Node& node,
         const std::string& topic_name,
         const xtypes::DynamicType& message_type,
-        TopicSubscriberSystem::SubscriptionCallback callback,
+        TopicSubscriberSystem::SubscriptionCallback* callback,
         const rmw_qos_profile_t& qos_profile)
 {
     return std::make_shared<Subscription>(
-        node, std::move(callback), topic_name, message_type, qos_profile);
+        node, callback, topic_name, message_type, qos_profile);
 }
 
 namespace {

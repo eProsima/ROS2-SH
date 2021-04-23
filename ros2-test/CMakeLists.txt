@@ -57,7 +57,7 @@ macro(compile_test)
             ${is_ros2_test_msg_LIBRARIES}
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
-	)
+    	)
 
     target_include_directories(${TEST_NAME}
         PRIVATE
