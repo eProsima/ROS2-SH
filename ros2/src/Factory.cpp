@@ -71,7 +71,7 @@ public:
             const xtypes::DynamicType& topic_type,
             rclcpp::Node& node,
             const std::string& topic_name,
-            TopicSubscriberSystem::SubscriptionCallback callback,
+            TopicSubscriberSystem::SubscriptionCallback* callback,
             const rmw_qos_profile_t& qos_profile)
     {
         auto it = _subscription_factories.find(topic_type.name());
@@ -84,7 +84,7 @@ public:
             return nullptr;
         }
 
-        return it->second(node, topic_name, topic_type, std::move(callback), qos_profile);
+        return it->second(node, topic_name, topic_type, callback, qos_profile);
     }
 
     void register_publisher_factory(
@@ -124,7 +124,7 @@ public:
             const std::string& service_response_type,
             rclcpp::Node& node,
             const std::string& service_name,
-            const ServiceClientSystem::RequestCallback& callback,
+            ServiceClientSystem::RequestCallback* callback,
             const rmw_qos_profile_t& qos_profile)
     {
         auto it = _client_proxy_factories.find(service_response_type);
@@ -214,11 +214,11 @@ std::shared_ptr<void> Factory::create_subscription(
         const xtypes::DynamicType& topic_type,
         rclcpp::Node& node,
         const std::string& topic_name,
-        TopicSubscriberSystem::SubscriptionCallback callback,
+        TopicSubscriberSystem::SubscriptionCallback* callback,
         const rmw_qos_profile_t& qos_profile)
 {
     return _pimpl->create_subscription(
-        topic_type, node, topic_name, std::move(callback), qos_profile);
+        topic_type, node, topic_name, callback, qos_profile);
 }
 
 //==============================================================================
@@ -255,7 +255,7 @@ std::shared_ptr<ServiceClient> Factory::create_client_proxy(
         const std::string& service_type,
         rclcpp::Node& node,
         const std::string& service_name,
-        const ServiceClientSystem::RequestCallback& callback,
+        ServiceClientSystem::RequestCallback* callback,
         const rmw_qos_profile_t& qos_profile)
 {
     return _pimpl->create_client_proxy(

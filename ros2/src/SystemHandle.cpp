@@ -339,11 +339,11 @@ SystemHandle::~SystemHandle()
 bool SystemHandle::subscribe(
         const std::string& topic_name,
         const xtypes::DynamicType& message_type,
-        SubscriptionCallback callback,
+        SubscriptionCallback* callback,
         const YAML::Node& configuration)
 {
     auto subscription = Factory::instance().create_subscription(
-        message_type, *_node, topic_name, std::move(callback),
+        message_type, *_node, topic_name, callback,
         parse_rmw_qos_configuration(configuration));
 
     if (!subscription)
@@ -418,7 +418,7 @@ std::shared_ptr<TopicPublisher> SystemHandle::advertise(
 bool SystemHandle::create_client_proxy(
         const std::string& service_name,
         const xtypes::DynamicType& service_type,
-        RequestCallback callback,
+        RequestCallback* callback,
         const YAML::Node& configuration)
 {
     auto client_proxy = Factory::instance().create_client_proxy(

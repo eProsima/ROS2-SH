@@ -178,7 +178,7 @@ public:
     ClientProxy(
             rclcpp::Node& node,
             const std::string& service_name,
-            const ServiceClientSystem::RequestCallback& callback,
+            ServiceClientSystem::RequestCallback* callback,
             const rmw_qos_profile_t& qos_profile)
         : _callback(callback)
         , _handle(std::make_shared<PromiseHolder>())
@@ -219,7 +219,7 @@ private:
         _handle->promise = &response_promise;
 
         std::future<Ros2_Response> future_response = response_promise.get_future();
-        _callback(_request_data, *this, _handle);
+        (*_callback)(_request_data, *this, _handle);
 
         if (std::future_status::ready == future_response.wait_for(std::chrono::milliseconds(5000))) // TODO: Make waiting time configurable.
         {
@@ -236,7 +236,7 @@ private:
         std::promise<Ros2_Response>* promise;
     };
 
-    const ServiceClientSystem::RequestCallback _callback;
+    ServiceClientSystem::RequestCallback* _callback;
     const std::shared_ptr<PromiseHolder> _handle;
     xtypes::DynamicData _request_data;
     Ros2_Response _response;
@@ -247,7 +247,7 @@ private:
 std::shared_ptr<is::ServiceClient> make_client(
         rclcpp::Node& node,
         const std::string& service_name,
-        const ServiceClientSystem::RequestCallback& callback,
+        ServiceClientSystem::RequestCallback* callback,
         const rmw_qos_profile_t& qos_profile)
 {
     return std::make_shared<ClientProxy>(node, service_name, callback, qos_profile);

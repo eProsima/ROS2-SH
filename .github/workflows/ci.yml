@@ -25,12 +25,12 @@ jobs:
 
       - name: Download the Integration Service Core
         run: |
-          git clone -b feature/soss-core-to-is-core --recursive https://github.com/eProsima/soss src/is-core
+          git clone -b feature/request_subscription_pools --recursive https://github.com/eProsima/soss src/is-core
 
       - name: Build
         run: |
           . /opt/ros/foxy/setup.sh
-          colcon build --packages-up-to is-ros2-test
+          colcon build --packages-up-to is-ros2-test --event-handlers console_direct+
 
       - name: Test
         run: |
