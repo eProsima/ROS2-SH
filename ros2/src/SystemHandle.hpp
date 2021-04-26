@@ -169,7 +169,7 @@ private:
     std::unique_ptr<rclcpp::executor::Executor> _executor;
 #else
     std::unique_ptr<rclcpp::Executor> _executor;
-#endif // SOSS_ROS2_ROSIDL_GENERATOR_CPP
+#endif //  ROS2_IS_SH__ROSIDL_GENERATOR_CPP
 
     rclcpp::ExecutorOptions _executor_options;
 
