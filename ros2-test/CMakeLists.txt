@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# is-websocket SystemHandle library and integration-service executable CMake project
+# is-ros2 test SystemHandle library and integration-service executable CMake project
 
 ###############################################################################################
 # CMake build rules for the Integration Service ROS 2 SystemHandle integration test library
@@ -57,7 +57,7 @@ macro(compile_test)
             ${is_ros2_test_msg_LIBRARIES}
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
-	)
+    	)
 
     target_include_directories(${TEST_NAME}
         PRIVATE

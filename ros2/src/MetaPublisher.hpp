@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _IS_SH_ROS2_INTERNAL_METAPUBLISHER_HPP_
-#define _IS_SH_ROS2_INTERNAL_METAPUBLISHER_HPP_
+#ifndef _IS_SH_ROS2__INTERNAL__METAPUBLISHER_HPP_
+#define _IS_SH_ROS2__INTERNAL__METAPUBLISHER_HPP_
 
 #include <is/systemhandle/SystemHandle.hpp>
 
@@ -41,4 +41,4 @@ std::shared_ptr<TopicPublisher> make_meta_publisher(
 } //  namespace is
 } //  namespace eprosima
 
-#endif // _IS_SH_ROS2_INTERNAL_METAPUBLISHER_HPP_
+#endif //  _IS_SH_ROS2__INTERNAL__METAPUBLISHER_HPP_

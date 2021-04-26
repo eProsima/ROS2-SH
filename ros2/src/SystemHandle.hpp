@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef _IS_SH_ROS2_INTERNAL_SYSTEMHANDLE_HPP_
-#define _IS_SH_ROS2_INTERNAL_SYSTEMHANDLE_HPP_
+#ifndef _IS_SH_ROS2__INTERNAL__SYSTEMHANDLE_HPP_
+#define _IS_SH_ROS2__INTERNAL__SYSTEMHANDLE_HPP_
 
 #include <is/systemhandle/SystemHandle.hpp>
 
@@ -89,7 +89,7 @@ public:
     bool subscribe(
             const std::string& topic_name,
             const xtypes::DynamicType& message_type,
-            SubscriptionCallback callback,
+            SubscriptionCallback* callback,
             const YAML::Node& configuration) override;
 
     /**
@@ -106,7 +106,7 @@ public:
     bool create_client_proxy(
             const std::string& service_name,
             const xtypes::DynamicType& service_type,
-            RequestCallback callback,
+            RequestCallback* callback,
             const YAML::Node& configuration) override;
 
     /**
@@ -116,7 +116,7 @@ public:
             const std::string& service_name,
             const xtypes::DynamicType&,
             const xtypes::DynamicType& reply_type,
-            RequestCallback callback,
+            RequestCallback* callback,
             const YAML::Node& configuration) override
     {
         return create_client_proxy(service_name, reply_type, callback, configuration);
