@@ -23,9 +23,9 @@ jobs:
           apt update
           DEBIAN_FRONTEND=noninteractive apt install -y cmake gcc g++ git libboost-dev libboost-program-options-dev libyaml-cpp-dev
 
-      - name: Download the Integration Service Core
+      - name: Download the Integration Service
         run: |
-          git clone -b feature/soss-core-to-is-core --recursive https://github.com/eProsima/soss src/is-core
+          git clone --recursive https://github.com/eProsima/Integration-Service src/integration-service
 
       - name: Build
         run: |
