@@ -19,10 +19,13 @@
 # CMake build rules for the Integration Service ROS 2 SystemHandle integration test library
 ###############################################################################################
 
-
 cmake_minimum_required(VERSION 3.5.0)
 
 project(is-ros2-test)
+
+if (NOT (BUILD_TESTS OR BUILD_ROS2_TESTS))
+    return()
+endif()
 
 # Get Integration Service dependencies
 find_package(xtypes REQUIRED)
@@ -30,6 +33,7 @@ find_package(is-core REQUIRED)
 find_package(is-mock REQUIRED)
 find_package(is-ros2-rosidl REQUIRED)
 find_package(is-ros2 REQUIRED)
+find_package(is-ros2-mix-generator REQUIRED)
 
 # Get message dependencies
 find_package(geometry_msgs REQUIRED)
@@ -79,11 +83,6 @@ macro(compile_test)
 
     add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE})
 endmacro()
-
-is_ros2_rosidl_mix(
-    PACKAGES geometry_msgs nav_msgs is_ros2_test_msg
-    MIDDLEWARES ros2
-)
 
 include(CTest)
 include(${IS_GTEST_CMAKE_MODULE_DIR}/gtest.cmake)
