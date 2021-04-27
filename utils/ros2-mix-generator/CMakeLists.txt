@@ -27,7 +27,6 @@ find_package(is-ros2-rosidl REQUIRED)
 find_package(is-ros2 REQUIRED)
 
 list(APPEND MIX_ROS_PACKAGES_LIST std_msgs)
-# set(MIX_ROS_PACKAGES_STR "std_msgs")
 
 if (MIX_ROS_PACKAGES)
 
@@ -35,7 +34,7 @@ if (MIX_ROS_PACKAGES)
 
     foreach(PKG ${MIX_ROS_PACKAGES_})
         find_package(${PKG} REQUIRED)
-        # string(CONCAT MIX_ROS_PACKAGES_STR ${MIX_ROS_PACKAGES_STR} " ${PKG}")
+
         list(APPEND MIX_ROS_PACKAGES_LIST ${PKG})
     endforeach()
 
@@ -48,11 +47,8 @@ if (BUILD_TESTS OR BUILD_ROS2_TESTS)
     find_package(is_ros2_test_msg REQUIRED)
 
     list(APPEND MIX_ROS_PACKAGES_LIST geometry_msgs nav_msgs is_ros2_test_msg)
-    # string(CONCAT MIX_ROS_PACKAGES_STR ${MIX_ROS_PACKAGES_STR} " geometry_msgs nav_msgs is_ros2_test_msg")
 
 endif()
-
-message(WARNING "PACKAGES_LIST: '${MIX_ROS_PACKAGES_LIST}'")
 
 is_ros2_rosidl_mix(
     PACKAGES ${MIX_ROS_PACKAGES_LIST}
