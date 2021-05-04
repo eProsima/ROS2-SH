@@ -103,13 +103,6 @@ set_property(
         "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
     )
 
-find_program(NODERED_EXECUTABLE NAMES node-red node-red@ PATH_SUFFIXES bin)
-
-if(NODERED_EXECUTABLE)
-    file(WRITE $ENV{HOME}/rosidl_msgs_path.txt "${CMAKE_INSTALL_PREFIX}/lib/is/ros2/msg\n${CMAKE_INSTALL_PREFIX}/include/is/rosidl/ros2")
-    message("${CMAKE_INSTALL_PREFIX}/lib/is/ros2/msg")
-endif()
-
 # Windows dll dependencies installation
 if(WIN32)
     find_file(MOCKDLL NAMES "is-mock.dll" PATHS "${is-mock_DIR}" PATH_SUFFIXES "lib" )
