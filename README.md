@@ -45,7 +45,7 @@ An illustrative explanation is also presented in the *Readme* `Configuration` se
 
 Regarding the *ROS 2 System Handle*, there are several specific parameters which can be configured
 for the ROS 2 middleware. All of these parameters are optional, and fall as suboptions of the main
-five sections described in the *Configuration* chapter of *Integration Service* repository:
+five sections described in the *Configuration* chapter of the *Integration Service* repository:
 
 * `systems`: The system `type` must be `ros2`. In addition to the `type` and `types-from` fields,
   the *ROS 2 System Handle* accepts the following specific configuration fields:
@@ -110,7 +110,7 @@ which will process them and produce a reply message which will be transmited bac
 For a detailed step by step guide on how to build and test this example, please refer to the
 [official documentation](TODO: link).
 -->
-### Bridging communication between two ROS 2 data spaces under different Domain IDs
+### Bridging the communication between two ROS 2 data spaces under different Domain IDs
 
 In this example, *Integration Service* uses this *ROS 2 System Handle*
 to forward the messages sent from a ROS 2 publisher hosted on a participant with domain ID **5** to
@@ -147,8 +147,8 @@ whole *Integration Service* product suite, there are some specific flags which a
   or `BUILD_ROS2_TESTS` is used, case in which some additional ROS 2 packages `mix` files
   required for testing will be built.
 
-  If an user wants to compile some additional packages to use them with *Integration Service*,
-  the following command must be launched to compile it, adding as much packages to the list as desired:
+  If the user wants to compile some additional packages to use them with *Integration Service*,
+  the following command must be launched to compile it, adding as many packages to the list as desired:
   ```bash
   ~/is_ws$ colcon build --cmake-args -DMIX_ROS_PACKAGES="std_msgs geometry_msgs sensor_msgs nav_msgs"
   ```
