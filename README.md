@@ -60,7 +60,7 @@ five sections described in the *Configuration* chapter of *Integration Service* 
   ```
   * `namespace`: The *namespace* of the ROS 2 node created by the *ROS 2 System Handle*.
 
-  * `domain_id`: The *ROS 2 System Handle* node name.
+  * `node_name`: The *ROS 2 System Handle* node name.
 
   * `domain`: Provides with an easy way to change the *Domain ID* of the ROS 2 entities created
     by the *ROS 2 System Handle*.
@@ -126,7 +126,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 Besides the [global compilation flags](<!-- TODO: link to IS readme section-->) available for the
 whole *Integration Service* product suite, there are some specific flags which apply only to the
-*Fast DDS System Handle*; they are listed below:
+*ROS 2 System Handle*; they are listed below:
 
 * `BUILD_ROS2_TESTS`: Allows to specifically compile the *ROS 2 System Handle* unitary and
   integration tests; this is useful to avoid compiling each *System Handle's* test suite present
