@@ -2,18 +2,21 @@
 
 # ROS 2 System Handle
 
+[![ROS 2 SH CI Status](https://github.com/eProsima/ROS2-SH/actions/workflows/ci.yml/badge.svg)](https://github.com/eProsima/ROS2-SH/actions)
+
 ## Introduction
 
 ### What is a System Handle?
-[![ROS 2 SH CI Status](https://github.com/eProsima/ROS2-SH/actions/workflows/ci.yml/badge.svg)](https://github.com/eProsima/ROS2-SH/actions)
 
-A [System Handle](<!--TODO: add link-->) is a plugin that allows a certain middleware
+A [System Handle](https://integration-service.docs.eprosima.com/en/latest/sh.html) is a plugin that allows a certain middleware
 or communication protocol to speak the same language used by the [eProsima Integration Service](https://github.com/eProsima/Integration-Service),
 that is, *Extensible and Dynamic Topic Types for DDS* (**xTypes**);
 specifically, *Integration Service* bases its intercommunication abilities on eProsima's open source
 implementation for the *xTypes* protocol, that is, [eProsima xTypes](https://github.com/eProsima/xtypes).
 
-![System Handle Architecture](docs/images/system-handle-architecture.png)
+<p align="center">
+  <a href="https://integration-service.docs.eprosima.com/en/latest/sh.html"><img src="docs/images/system-handle-architecture.png"></a>
+</p>
 
 ### The ROS 2 SystemHandle
 
@@ -24,10 +27,10 @@ for the [ROS 2](https://docs.ros.org/en/foxy) middleware protocol, widely used i
 
 This *System Handle* can be used for two main purposes:
 
-* Connection between a *ROS 2* application and an application running over a different middleware implementation.
+1. Connection between a *ROS 2* application and an application running over a different middleware implementation.
   This is the classic use-case approach for *Integration Service*.
 
-* Connecting two *ROS 2* applications running under different Domain IDs.
+1. Connecting two *ROS 2* applications running under different Domain IDs.
 
 ## Configuration
 
@@ -39,9 +42,7 @@ intercommunication architecture.
 
 To get a more precise idea on how these YAML files have to be filled and which fields they require
 in order to succesfully configure and launch an *Integration Service* project, please refer to the
-dedicated [configuration](<!-- TODO: add link -->) section of the official documentation.
-An illustrative explanation is also presented in the *Readme* `Configuration` section of the
-[general project repository](https://github.com/eProsima/Integration-Service).
+[dedicated configuration section](https://integration-service.docs.eprosima.com/en/latest/yaml_config.html) of the official documentation.
 
 Regarding the *ROS 2 System Handle*, there are several specific parameters which can be configured
 for the ROS 2 middleware. All of these parameters are optional, and fall as suboptions of the main
@@ -72,28 +73,42 @@ in the project's [main source code repository]([https://](https://github.com/ePr
 
 Some of these examples, where the *ROS 2 System Handle* plays a different role in each of them, are introduced here.
 
-### Publisher/subscriber intercommunication between ROS 2 and ROS 1
+<a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+
+### ROS 2 - ROS 1 bridge  (publisher -> subscriber)
 
 In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *ROS 1 System Handle*
 to transmit data coming from a ROS 2 publisher into the ROS 1 data space, so that it can be
 consumed by a ROS 1 subscriber on the same topic, and viceversa.
 
+<p align="center">
+  <a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img src="docs/images/ros2_ros1_pubsub_example.png" width="500"></a>
+</p>
+
 The configuration file used by *Integration Service* for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros1_ros2__helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[official documentation](<!-- TODO: link to example -->).
-### Publisher/subscriber intercommunication between ROS 2 and Fast DDS
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html) in the official documentation.
+
+<a href="https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+
+### ROS 2 - DDS bridge  (publisher -> subscriber)
 
 In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *Fast DDS System Handle*
 to transmit data coming from a ROS 2 publisher into the DDS data space, so that it can be
 consumed by a Fast DDS subscriber on the same topic, and viceversa.
 
+<p align="center">
+  <a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img src="docs/images/ros2_dds_pubsub_example.png" width="500"></a>
+</p>
+
 The configuration file used by *Integration Service* for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/fastdds_ros2__helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[official documentation](<!-- TODO: link to example -->).
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html) in the official documentation.
+
 
 <!-- TODO: add YAML and applications for DDS and ROS2 to test this
 ### ROS 2 service server addressing petitions coming from a DDS service client
@@ -110,17 +125,25 @@ which will process them and produce a reply message which will be transmited bac
 For a detailed step by step guide on how to build and test this example, please refer to the
 [official documentation](TODO: link).
 -->
-### Bridging the communication between two ROS 2 data spaces under different Domain IDs
+
+<a href="https://integration-service.docs.eprosima.com/en/latest/ros2_change_domain.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+
+### ROS 2 Domain ID change
 
 In this example, *Integration Service* uses this *ROS 2 System Handle*
 to forward the messages sent from a ROS 2 publisher hosted on a participant with domain ID **5** to
 a subscriber created under domain ID **10**.
 
+<p align="center">
+  <a href="https://integration-service.docs.eprosima.com/en/latest/ros2_change_domain.html"><img src="docs/images/ros2_domain_id_change.png" width="600"></a>
+</p>
+
 The configuration file for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros2__domain_id_change.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[official documentation](<!--TODO: link-->).
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/ros2_change_domain.html) in the official documentation.
+
 
 ## Compilation flags
 
