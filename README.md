@@ -100,7 +100,7 @@ to transmit data coming from a ROS 2 publisher into the DDS data space, so that 
 consumed by a Fast DDS subscriber on the same topic, and viceversa.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img src="docs/images/ros2_dds_pubsub_example.png" width="500"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html"><img src="docs/images/ros2_dds_pubsub_example.png" width="500"></a>
 </p>
 
 The configuration file used by *Integration Service* for this example can be found
