@@ -147,7 +147,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 ## Compilation flags
 
-Besides the [global compilation flags](<!-- TODO: link to IS readme section-->) available for the
+Besides the [global compilation flags](https://integration-service.docs.eprosima.com/en/latest/installation.html#global-compilation-flags) available for the
 whole *Integration Service* product suite, there are some specific flags which apply only to the
 *ROS 2 System Handle*; they are listed below:
 
