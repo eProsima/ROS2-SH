@@ -20,7 +20,7 @@ implementation for the *xTypes* protocol, that is, [eProsima xTypes](https://git
 
 ### The ROS 2 SystemHandle
 
-<a href="https://docs.ros.org/en/foxy/"><img src="docs/images/ros2_logo.png" align="left" hspace="8" vspace="2" width="120"></a>
+<a href="https://docs.ros.org/en/foxy/"><img src="docs/images/ros2_logo.png" align="left" hspace="8" vspace="0" width="90"></a>
 
 This repository contains the source code of *Integration Service* **System Handle**
 for the [ROS 2](https://docs.ros.org/en/foxy) middleware protocol, widely used in the robotics field.
