@@ -75,7 +75,7 @@ Some of these examples, where the *ROS 2 System Handle* plays a different role i
 
 <a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
-### ROS 2 - ROS 1 bridge  (publisher -> subscriber)
+### ROS 2 - ROS 1 bridge  (publisher - subscriber)
 
 In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *ROS 1 System Handle*
 to transmit data coming from a ROS 2 publisher into the ROS 1 data space, so that it can be
@@ -93,7 +93,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 <a href="https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
-### ROS 2 - DDS bridge  (publisher -> subscriber)
+### ROS 2 - DDS bridge  (publisher - subscriber)
 
 In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *Fast DDS System Handle*
 to transmit data coming from a ROS 2 publisher into the DDS data space, so that it can be
@@ -111,7 +111,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 <a href="https://integration-service.docs.eprosima.com/en/latest/ros2-websocket.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
-### ROS 2 - WebSocket bridge  (publisher -> subscriber)
+### ROS 2 - WebSocket bridge  (publisher - subscriber)
 
 In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *WebSocket System Handle*
 to transmit data coming from a ROS 2 publisher to a WebSocket Client, and viceversa.
@@ -128,7 +128,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 <a href="https://integration-service.docs.eprosima.com/en/latest/fiware-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
-### ROS 2 - FIWARE bridge  (publisher -> subscriber)
+### ROS 2 - FIWARE bridge  (publisher - subscriber)
 
 In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *FIWARE System Handle*
 to transmit data coming from a ROS 2 publisher and update them in a FIWARE Context Broker MongoDB database, and viceversa.
