@@ -8,14 +8,14 @@
 
 ### What is a System Handle?
 
-A [System Handle](https://integration-service.docs.eprosima.com/en/latest/sh.html) is a plugin that allows a certain middleware
+A [System Handle](https://integration-service.docs.eprosima.com/en/latest/user_manual/systemhandle/sh.html) is a plugin that allows a certain middleware
 or communication protocol to speak the same language used by the [eProsima Integration Service](https://github.com/eProsima/Integration-Service),
 that is, *Extensible and Dynamic Topic Types for DDS* (**xTypes**);
 specifically, *Integration Service* bases its intercommunication abilities on eProsima's open source
 implementation for the *xTypes* protocol, that is, [eProsima xTypes](https://github.com/eProsima/xtypes).
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/sh.html"><img src="docs/images/system-handle-architecture.png"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/user_manual/systemhandle/sh.html"><img src="docs/images/system-handle-architecture.png"></a>
 </p>
 
 ### The ROS 2 SystemHandle
@@ -42,7 +42,7 @@ intercommunication architecture.
 
 To get a more precise idea on how these YAML files have to be filled and which fields they require
 in order to succesfully configure and launch an *Integration Service* project, please refer to the
-[dedicated configuration section](https://integration-service.docs.eprosima.com/en/latest/yaml_config.html) of the official documentation.
+[dedicated configuration section](https://integration-service.docs.eprosima.com/en/latest/user_manual/yaml_config.html) of the official documentation.
 
 Regarding the *ROS 2 System Handle*, there are several specific parameters which can be configured
 for the ROS 2 middleware. All of these parameters are optional, and fall as suboptions of the main
@@ -73,7 +73,7 @@ in the project's [main source code repository]([https://](https://github.com/ePr
 
 Some of these examples, where the *ROS 2 System Handle* plays a different role in each of them, are introduced here.
 
-<a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+<a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros1-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 - ROS 1 bridge  (publisher - subscriber)
 
@@ -82,16 +82,16 @@ to transmit data coming from a ROS 2 publisher into the ROS 1 data space, so tha
 consumed by a ROS 1 subscriber on the same topic, and viceversa.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html"><img src="docs/images/ros2_ros1_pubsub_example.png" width="500"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros1-ros2.html"><img src="docs/images/ros2_ros1_pubsub_example.png" width="500"></a>
 </p>
 
 The configuration file used by *Integration Service* for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros1_ros2__helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[dedicated section](https://integration-service.docs.eprosima.com/en/latest/ros1-ros2.html) in the official documentation.
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros1-ros2.html) in the official documentation.
 
-<a href="https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+<a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/dds-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 - DDS bridge  (publisher - subscriber)
 
@@ -100,16 +100,16 @@ to transmit data coming from a ROS 2 publisher into the DDS data space, so that 
 consumed by a Fast DDS subscriber on the same topic, and viceversa.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html"><img src="docs/images/ros2_dds_pubsub_example.png" width="500"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/dds-ros2.html"><img src="docs/images/ros2_dds_pubsub_example.png" width="500"></a>
 </p>
 
 The configuration file used by *Integration Service* for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/fastdds_ros2__helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[dedicated section](https://integration-service.docs.eprosima.com/en/latest/dds-ros2.html) in the official documentation.
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/dds-ros2.html) in the official documentation.
 
-<a href="https://integration-service.docs.eprosima.com/en/latest/ros2-websocket.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+<a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros2-websocket.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 - WebSocket bridge  (publisher - subscriber)
 
@@ -117,16 +117,16 @@ In this example, *Integration Service* uses both this *ROS 2 System Handle* and 
 to transmit data coming from a ROS 2 publisher to a WebSocket Client, and viceversa.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/ros2-websocket.html"><img src="docs/images/ros2_websocket_pubsub_example.png" width="420"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros2-websocket.html"><img src="docs/images/ros2_websocket_pubsub_example.png" width="420"></a>
 </p>
 
 The configuration file used by *Integration Service* for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros2_websocket__helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[dedicated section](https://integration-service.docs.eprosima.com/en/latest/ros2-websocket.html) in the official documentation.
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros2-websocket.html) in the official documentation.
 
-<a href="https://integration-service.docs.eprosima.com/en/latest/fiware-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+<a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/fiware-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 - FIWARE bridge  (publisher - subscriber)
 
@@ -134,14 +134,14 @@ In this example, *Integration Service* uses both this *ROS 2 System Handle* and 
 to transmit data coming from a ROS 2 publisher and update them in a FIWARE Context Broker MongoDB database, and viceversa.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/fiware-ros2.html"><img src="docs/images/ros2_fiware_pubsub_example.png" width="420"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/fiware-ros2.html"><img src="docs/images/ros2_fiware_pubsub_example.png" width="420"></a>
 </p>
 
 The configuration file used by *Integration Service* for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros2_fiware__helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[dedicated section](https://integration-service.docs.eprosima.com/en/latest/fiware-ros2.html) in the official documentation.
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/fiware-ros2.html) in the official documentation.
 
 
 <!-- TODO: add YAML and applications for DDS and ROS2 to test this
@@ -160,7 +160,7 @@ For a detailed step by step guide on how to build and test this example, please 
 [official documentation](TODO: link).
 -->
 
-<a href="https://integration-service.docs.eprosima.com/en/latest/ros2_change_domain.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+<a href="https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 Domain ID change
 
@@ -169,19 +169,19 @@ to forward the messages sent from a ROS 2 publisher hosted on a participant with
 a subscriber created under domain ID **10**.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/ros2_change_domain.html"><img src="docs/images/ros2_domain_id_change.png" width="580"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html"><img src="docs/images/ros2_domain_id_change.png" width="580"></a>
 </p>
 
 The configuration file for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros2__domain_id_change.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[dedicated section](https://integration-service.docs.eprosima.com/en/latest/ros2_change_domain.html) in the official documentation.
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html) in the official documentation.
 
 
 ## Compilation flags
 
-Besides the [global compilation flags](https://integration-service.docs.eprosima.com/en/latest/installation.html#global-compilation-flags) available for the
+Besides the [global compilation flags](https://integration-service.docs.eprosima.com/en/latest/installation_manual/installation.html#global-compilation-flags) available for the
 whole *Integration Service* product suite, there are some specific flags which apply only to the
 *ROS 2 System Handle*; they are listed below:
 
