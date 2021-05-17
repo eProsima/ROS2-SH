@@ -219,7 +219,7 @@ whole *Integration Service* product suite, there are some specific flags which a
   this means that the `mix` generation engine will not look for *ROS 1* packages present in this list,
   allowing to compile specific *ROS 2* packages independently.
 
-  For example, if a user wants to compile certain package `dummy_msgs` independently from *ROS 2*,
+  For example, if a user wants to compile a certain package `dummy_msgs` independently from *ROS 2*,
   but compiling `std_msgs` and `geometry_msgs` for both the *ROS 1* and *ROS 2 System Handles*,
   the following command should be executed:
   ```bash
