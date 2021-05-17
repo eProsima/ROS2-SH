@@ -199,8 +199,8 @@ whole *Integration Service* product suite, there are some specific flags which a
   library to convert the specific ROS 2 type definitions into *xTypes*, and the other way around, will be built.
   This list is shared with the [ROS 1 System Handle](https://github.com/eProsima/ROS1-SH#compilation-flags),
   meaning that the ROS packages specified in the `MIX_ROS_PACKAGES` variable will also be built for *ROS 1*
-  if this *System Handle* is present within the *Integration Service* workspace. If a certain package
-  is only present in *ROS 2*, the `MIX_ROS2_PACKAGES` flag must be used instead.
+  if the corresponding *System Handle* is present within the *Integration Service* workspace.
+  To avoid possible errors, if a certain package is only present in *ROS 2*, the `MIX_ROS2_PACKAGES` flag must be used instead.
 
   These transformation libraries are also known within the *Integration Service* context as `Middleware Interface Extension`
   or `mix` libraries.
@@ -216,7 +216,7 @@ whole *Integration Service* product suite, there are some specific flags which a
   ```
 
 * `MIX_ROS2_PACKAGES`: It is used just as the `MIX_ROS_PACKAGES` flag, but will only affect *ROS 2*;
-  this means that the `mix` generation engine will not look for *ROS 1* packages present in this list,
+  this means that the `mix` generation engine will not search within the *ROS 1* packages,
   allowing to compile specific *ROS 2* packages independently.
 
   For example, if a user wants to compile a certain package `dummy_msgs` independently from *ROS 2*,
