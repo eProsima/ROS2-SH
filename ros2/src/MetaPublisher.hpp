@@ -29,6 +29,25 @@ namespace sh {
 namespace ros2 {
 
 //==============================================================================
+/**
+ * @brief Produces a is::TopicPublisher that allows to use runtime substitution parameters
+ * in the YAML configuration file.
+ *
+ * @see is::core::StringTemplate
+ *
+ * @param[in] message_type A reference to the dynamic type representation of the topic type.
+ *
+ * @param[in] node The ROS 1 node that will hold this publisher.
+ *
+ * @param[in] topic_name The topic name to publish to.
+ *
+ * @param[in] qos_profile The QoS used to create the publisher.
+ *
+ * @param[in] configuration The configuration specific for this SystemHandle,
+ *            as described in the user-provided `YAML` input file.
+ *
+ * @returns A pointer to the created *Integration Service* TopicPublisher entity.
+ */
 std::shared_ptr<TopicPublisher> make_meta_publisher(
         const eprosima::xtypes::DynamicType& message_type,
         rclcpp::Node& node,
