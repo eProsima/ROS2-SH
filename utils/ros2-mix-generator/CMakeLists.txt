@@ -40,6 +40,18 @@ if (MIX_ROS_PACKAGES)
 
 endif()
 
+if (MIX_ROS2_PACKAGES)
+
+    string(REPLACE " " ";" MIX_ROS2_PACKAGES_ ${MIX_ROS2_PACKAGES})
+
+    foreach(PKG ${MIX_ROS2_PACKAGES_})
+        find_package(${PKG} REQUIRED)
+
+        list(APPEND MIX_ROS_PACKAGES_LIST ${PKG})
+    endforeach()
+
+endif()
+
 if (BUILD_TESTS OR BUILD_ROS2_TESTS)
 
     find_package(geometry_msgs REQUIRED)

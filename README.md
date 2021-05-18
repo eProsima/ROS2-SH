@@ -194,20 +194,36 @@ whole *Integration Service* product suite, there are some specific flags which a
   ~/is_ws$ colcon build --cmake-args -DBUILD_ROS2_TESTS=ON
   ```
 
-* `MIX_ROS_PACKAGES`: It accepts as an argument a list of [ROS 2 packages](https://index.ros.org/packages/),
+* `MIX_ROS_PACKAGES`: It accepts as an argument a list of [ROS packages](https://index.ros.org/packages/),
   such as `std_msgs`, `geometry_msgs`, `sensor_msgs`, `nav_msgs`... for which the required transformation
   library to convert the specific ROS 2 type definitions into *xTypes*, and the other way around, will be built.
-  This library is also known within the *Integration Service* context as `Middleware Interface Extension`
-  or `mix` library.
+  This list is shared with the [ROS 1 System Handle](https://github.com/eProsima/ROS1-SH#compilation-flags),
+  meaning that the ROS packages specified in the `MIX_ROS_PACKAGES` variable will also be built for *ROS 1*
+  if the corresponding *System Handle* is present within the *Integration Service* workspace.
+  To avoid possible errors, if a certain package is only present in *ROS 2*, the `MIX_ROS2_PACKAGES` flag must be used instead.
+
+  These transformation libraries are also known within the *Integration Service* context as `Middleware Interface Extension`
+  or `mix` libraries.
 
   By default, only the `std_msgs_mix` library is compiled, unless the `BUILD_TESTS`
   or `BUILD_ROS2_TESTS` is used, case in which some additional ROS 2 packages `mix` files
   required for testing will be built.
 
   If the user wants to compile some additional packages to use them with *Integration Service*,
-  the following command must be launched to compile it, adding as many packages to the list as desired:
+  the following command must be launched to compile it, adding as much packages to the list as desired:
   ```bash
   ~/is_ws$ colcon build --cmake-args -DMIX_ROS_PACKAGES="std_msgs geometry_msgs sensor_msgs nav_msgs"
+  ```
+
+* `MIX_ROS2_PACKAGES`: It is used just as the `MIX_ROS_PACKAGES` flag, but will only affect *ROS 2*;
+  this means that the `mix` generation engine will not search within the *ROS 1* packages,
+  allowing to compile specific *ROS 2* packages independently.
+
+  For example, if a user wants to compile a certain package `dummy_msgs` independently from *ROS 2*,
+  but compiling `std_msgs` and `geometry_msgs` for both the *ROS 1* and *ROS 2 System Handles*,
+  the following command should be executed:
+  ```bash
+  ~/is_ws$ colcon build --cmake-args -DMIX_ROS_PACKAGES="std_msgs geometry_msgs" -DMIX_ROS2_PACKAGES="dummy_msgs"
   ```
 
 <!-- TODO: complete when it is uploaded to read the docs

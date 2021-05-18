@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
           . /opt/ros/foxy/setup.sh
-          colcon build --cmake-args -DBUILD_ROS2_TESTS=ON --event-handlers console_direct+
+          colcon build --cmake-args -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ROS2_TESTS=ON --event-handlers console_direct+
 
       - name: Test
         run: |
