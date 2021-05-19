@@ -31,7 +31,7 @@ namespace ros2 {
 //==============================================================================
 /**
  * @brief Produces a is::TopicPublisher that allows to use runtime substitution parameters
- * in the YAML configuration file.
+ * in the *YAML* configuration file.
  *
  * @see is::core::StringTemplate
  *
@@ -44,7 +44,7 @@ namespace ros2 {
  * @param[in] qos_profile The QoS used to create the publisher.
  *
  * @param[in] configuration The configuration specific for this SystemHandle,
- *            as described in the user-provided `YAML` input file.
+ *            as described in the user-provided *YAML* input file.
  *
  * @returns A pointer to the created *Integration Service* TopicPublisher entity.
  */
