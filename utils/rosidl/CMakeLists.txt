@@ -19,6 +19,15 @@ cmake_minimum_required(VERSION 3.5.0 FATAL_ERROR)
 
 project(is-ros2-rosidl)
 
+###################################################################################
+# Configure options
+###################################################################################
+option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+
+if(NOT BUILD_LIBRARY)
+    return()
+endif()
+
 find_package(is-core REQUIRED)
 find_package(rosidl_parser QUIET)
 

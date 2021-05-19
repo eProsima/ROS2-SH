@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(is_ros2_test_msg)
 
+###################################################################################
+# Configure options
+###################################################################################
+option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+
+if(NOT BUILD_LIBRARY)
+  return()
+endif()
+
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 

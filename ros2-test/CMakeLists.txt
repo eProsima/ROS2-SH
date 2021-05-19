@@ -23,6 +23,15 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(is-ros2-test)
 
+###################################################################################
+# Configure options
+###################################################################################
+option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+
+if(NOT BUILD_LIBRARY)
+    return()
+endif()
+
 if (NOT (BUILD_TESTS OR BUILD_ROS2_TESTS))
     return()
 endif()
