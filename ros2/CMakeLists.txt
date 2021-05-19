@@ -158,7 +158,6 @@ set(IS_ROS2_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 file(GLOB_RECURSE HPP_FILES
     "${IS_ROS2_INCLUDE_DIR}/*.h*"
     "${IS_ROS2_SOURCE_DIR}/*.h*")
-message(WARNING "HPP FILES ${HPP_FILES}")
 
 # Doxygen related variables
 set(DOXYGEN_INPUT_DIR "${IS_ROS2_INCLUDE_DIR} ${IS_ROS2_SOURCE_DIR}")
