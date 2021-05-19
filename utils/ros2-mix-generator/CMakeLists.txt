@@ -22,6 +22,15 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(is-ros2-mix-generator)
 
+###################################################################################
+# Configure options
+###################################################################################
+option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+
+if(NOT BUILD_LIBRARY)
+    return()
+endif()
+
 # Get dependencies
 find_package(is-ros2-rosidl REQUIRED)
 find_package(is-ros2 REQUIRED)
