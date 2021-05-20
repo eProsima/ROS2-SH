@@ -165,8 +165,7 @@ if(BUILD_API_REFERENCE)
     # Create doxygen directories
     add_custom_target(doc-dirs
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/doxygen
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/html
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/html/doxygen
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/doxygen/html
         COMMENT "Creating documentation directories" VERBATIM)
 
     set(IS_ROS2_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include/is/sh/ros2")
@@ -181,7 +180,8 @@ if(BUILD_API_REFERENCE)
     set(DOXYGEN_INDEX_FILE "${PROJECT_BINARY_DIR}/doxygen/xml/index.xml")
     set(DOXYFILE_IN "${IS_DOXYGEN_CONFIG_FILE}")
     set(DOXYFILE_OUT ${PROJECT_BINARY_DIR}/doxygen-config)
-    set(DOXYGEN_TAGFILES "../is-core/is_core.tag=../is-core/html")
+    set(DOXYGEN_TAGFILES "../is-core/is_core.tag=../is-core/doxygen/html")
+    set(DOXYGEN_HTML_DIR "${PROJECT_BINARY_DIR}/doxygen/html")
 
     # Configure doxygen
     configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
