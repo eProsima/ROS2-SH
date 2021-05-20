@@ -153,7 +153,7 @@ playing the role of a service server capable of processing incoming requests fro
 *WebSocket*) and producing an appropriate answer for them.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/services/ros2-server.html"><img src="docs/images/dds_services_example.png" width="550"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/services/ros2-server.html"><img src="docs/images/ros2_services_example.png" width="550"></a>
 </p>
 
 The configuration file used by *Integration Service* for this example can be found
