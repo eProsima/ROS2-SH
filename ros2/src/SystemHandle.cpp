@@ -34,7 +34,11 @@ namespace is {
 namespace sh {
 namespace ros2 {
 
+const bool ROS_FOXY = (0 == strcmp("foxy", getenv("ROS_DISTRO")));
+
 namespace {
+
+#if ROS_FOXY
 
 bool set_platform_env(
         const std::string& variable,
@@ -59,6 +63,8 @@ int unset_platform_env(
     return (0 == unsetenv(variable.c_str()));
 #endif // WIN32
 }
+
+#endif //  if ROS_FOXY
 
 rmw_qos_profile_t parse_rmw_qos_configuration(
         const YAML::Node& /*configuration*/)
@@ -97,6 +103,15 @@ void SystemHandle::print_missing_mix_file(
 SystemHandle::SystemHandle()
     : _logger("is::sh::ROS2")
 {
+#if ROS_VERSION != 2
+
+    _logger << utils::Logger::Level::ERROR
+            << "Please make sure to source a ROS 2 distro just before compiling this System Handle!"
+            << std::endl;
+
+    throw std::runtime_error("Invalid $ROS_DISTRO");
+
+#endif //  if ROS_VERSION != 2
 }
 
 //==============================================================================
@@ -141,6 +156,9 @@ bool SystemHandle::configure(
                     << name << "'." << std::endl;
         }
         // TODO(@jamoralp) Warn if not set a custom node name unique for each node.
+
+#if ROS_FOXY
+
         std::string previous_domain;
         if (getenv("ROS_DOMAIN_ID") != nullptr)
         {
@@ -157,6 +175,9 @@ bool SystemHandle::configure(
 
             return false;
         }
+
+#endif //  if ROS_FOXY
+
         /**
          * Since ROS2 Foxy, there is one participant per context.
          * Thus, to ensure isolation between nodes,
@@ -168,6 +189,10 @@ bool SystemHandle::configure(
         {
             init_options.auto_initialize_logging(false);
         }
+
+#if !ROS_FOXY
+        init_options.set_domain_id(domain_node.as<size_t>());
+#endif //  if !ROS_FOXY
 
         const char* context_argv[1];
         const std::string context_name("is_ros2_context_" + name);
@@ -183,9 +208,12 @@ bool SystemHandle::configure(
 
         _node = std::make_shared<rclcpp::Node>(name, ns, *_node_options);
 
+#if ROS_FOXY
+
         _logger << utils::Logger::Level::INFO
                 << "Created node '" << ns << "/" << name << "' with Domain ID: "
                 << _node_options->get_rcl_node_options()->domain_id << std::endl;
+
 
         if (previous_domain.empty())
         {
@@ -195,6 +223,14 @@ bool SystemHandle::configure(
         {
             success &= set_platform_env("ROS_DOMAIN_ID", previous_domain.c_str(), true);
         }
+
+#else
+
+        _logger << utils::Logger::Level::INFO
+                << "Created node '" << ns << "/" << name << "' with Domain ID: "
+                << init_options.get_domain_id() << std::endl;
+
+#endif //  if foxy == ROS_DISTRO
     }
     else
     {
