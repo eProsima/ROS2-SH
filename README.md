@@ -32,6 +32,12 @@ This *System Handle* can be used for two main purposes:
 
 1. Connecting two *ROS 2* applications running under different Domain IDs.
 
+## Dependencies
+
+This section provides a list of the dependencies needed in order to compile *ROS 2 System Handle*.
+
+* [ROS 2](https://docs.ros.org/en/foxy/Installation.html): *Foxy ROS 2* distribution.
+
 ## Configuration
 
 *Integration Service* is configured by means of a YAML configuration file, which specifies
