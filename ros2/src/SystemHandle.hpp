@@ -47,9 +47,9 @@ namespace ros2 {
  *        ROS 2. This will be mainly related to the use of the new API for setting the DOMAIN ID
  *        within every ROS 2 node, instead of using the `ROS_DOMAIN_ID` environment variable.
  *
- * @note This SystemHandle is currently prepared to support the latest LTS distribution
- *       of ROS 2, that is, <a href="https://docs.ros.org/en/foxy/Releases/Release-Foxy-Fitzroy.html">
- *       Foxy Fitzroy</a>.
+ * @note This SystemHandle is currently prepared to support the latest distribution
+ *       of ROS 2, that is, <a href="https://docs.ros.org/en/galactic/Releases/Release-Galactic-Geochelone.html">
+ *       Galactic Geochelone</a>.
  *
  */
 class SystemHandle : public virtual FullSystem

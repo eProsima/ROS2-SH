@@ -38,10 +38,21 @@ namespace xtypes = eprosima::xtypes;
 
 static is::utils::Logger logger("is::sh::ROS2::test::test_domain");
 
-constexpr const size_t DOMAIN_ID_1 = 5;
-constexpr const size_t DOMAIN_ID_2 = 10;
+constexpr const char* DOMAIN_ID_1 = "5";
+constexpr const char* DOMAIN_ID_2 = "10";
 
-TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
+#ifdef WIN32
+#define SETENV(id, value, b) \
+    {std::ostringstream _aux_d; \
+     _aux_d << id << "=" << value; \
+     _putenv(_aux_d.str().c_str());}
+#define UNSETENV(id, retValue) SETENV(id, "", false)
+#else
+#define SETENV(id, value, b) setenv(id, value, b)
+#define UNSETENV(id) unsetenv(id)
+#endif // ifdef WIN32
+
+TEST(ROS2, Change_ROS2_Domain_id__ROS2_Foxy)
 {
     char const* const argv[1] = {"is_ros2_test_domain_id"};
     if (!rclcpp::ok())
@@ -50,16 +61,16 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
     }
     ASSERT_TRUE(rclcpp::ok());
 
-    // Create the nodes in separate context, since in ROS2 Galactic each context uses
+    // Create the nodes in separate context, since in ROS2 Foxy each context uses
     // an unique DDS participant and thus creating the two nodes in the same context
     // would result in them having the same DOMAIN_ID.
+    SETENV("ROS_DOMAIN_ID", DOMAIN_ID_1, true);
 
     rclcpp::InitOptions init_options_1;
     if (rcl_logging_rosout_enabled())
     {
         init_options_1.auto_initialize_logging(false);
     }
-    init_options_1.set_domain_id(DOMAIN_ID_1);
 
     const char* const argv_1[1] = {"is_ros2_test_domain_id_context_1"};
     auto context_1 = std::make_shared<rclcpp::Context>();
@@ -68,15 +79,20 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
     rclcpp::NodeOptions node_ops_1;
     node_ops_1.context(context_1);
 
+    // This needs to be called so that NodeOptions::node_options_ pointer gets filled.
+    auto rcl_node_ops_1 = node_ops_1.get_rcl_node_options();
+
     auto node_1 = std::make_shared<rclcpp::Node>("node_1", node_ops_1);
 
+    UNSETENV("ROS_DOMAIN_ID");
+
+    SETENV("ROS_DOMAIN_ID", DOMAIN_ID_2, true);
 
     rclcpp::InitOptions init_options_2;
     if (rcl_logging_rosout_enabled())
     {
         init_options_2.auto_initialize_logging(false);
     }
-    init_options_2.set_domain_id(DOMAIN_ID_2);
 
     const char* const argv_2[1] = {"is_ros2_test_domain_id_context_2"};
     auto context_2 = std::make_shared<rclcpp::Context>();
@@ -85,16 +101,29 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
     rclcpp::NodeOptions node_ops_2;
     node_ops_2.context(context_2);
 
+    // This needs to be called so that NodeOptions::node_options_ pointer gets filled.
+    auto rcl_node_ops_2 = node_ops_2.get_rcl_node_options();
+
     auto node_2 = std::make_shared<rclcpp::Node>("node_2", node_ops_2);
 
-    // Check correct DOMAIN ID for node_1 and node_2
-    ASSERT_EQ(init_options_1.get_domain_id(), DOMAIN_ID_1);
-    logger << is::utils::Logger::Level::INFO
-           << "Domain ID for 'node_1': " << init_options_1.get_domain_id() << std::endl;
+    UNSETENV("ROS_DOMAIN_ID");
 
-    ASSERT_EQ(init_options_2.get_domain_id(), DOMAIN_ID_2);
+    // Check correct DOMAIN ID for node_1 and node_2
+# define CHECK_DOMAIN_ID(NODE_OPS, DOMAIN_ID) \
+    { \
+        std::stringstream ss(DOMAIN_ID); \
+        size_t domain_id; \
+        ss >> domain_id; \
+        ASSERT_EQ(NODE_OPS->domain_id, domain_id); \
+    }
+
+    CHECK_DOMAIN_ID(rcl_node_ops_1, DOMAIN_ID_1);
     logger << is::utils::Logger::Level::INFO
-           << "Domain ID for 'node_2': " << init_options_2.get_domain_id() << std::endl;
+           << "Domain ID for 'node_1': " << rcl_node_ops_1->domain_id << std::endl;
+
+    CHECK_DOMAIN_ID(rcl_node_ops_2, DOMAIN_ID_2);
+    logger << is::utils::Logger::Level::INFO
+           << "Domain ID for 'node_2': " << rcl_node_ops_2->domain_id << std::endl;
 
     const std::string topic_name("string_topic");
 

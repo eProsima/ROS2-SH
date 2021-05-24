@@ -10,8 +10,12 @@ on:
 
 jobs:
   ros2-sh_CI:
+    strategy:
+      matrix:
+        node: [foxy, rolling]
+
     runs-on: ubuntu-20.04
-    container: ros:foxy
+    container: ros:${{ matrix.node }}
 
     steps:
       - uses: actions/checkout@v2
@@ -29,10 +33,10 @@ jobs:
 
       - name: Build
         run: |
-          . /opt/ros/foxy/setup.sh
+          . /opt/ros/${{ matrix.node }}/setup.sh
           colcon build --cmake-args -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ROS2_TESTS=ON --event-handlers console_direct+
 
       - name: Test
         run: |
-          . /opt/ros/foxy/setup.sh && . install/local_setup.sh && colcon test --packages-up-to is-ros2-test --event-handlers console_direct+
+          . /opt/ros/${{ matrix.node }}/setup.sh && . install/local_setup.sh && colcon test --packages-up-to is-ros2-test --event-handlers console_direct+
           colcon test-result

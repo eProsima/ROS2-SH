@@ -21,8 +21,6 @@
 
 cmake_minimum_required(VERSION 3.5.0)
 
-project(is-ros2-test)
-
 ###################################################################################
 # Configure options
 ###################################################################################
@@ -35,6 +33,28 @@ endif()
 if (NOT (BUILD_TESTS OR BUILD_ROS2_TESTS))
     return()
 endif()
+
+project(is-ros2-test)
+
+# Check if the user specified which ROS 2 version he/she is using. If not, warn and try to automatically get it
+if(NOT IS_ROS2_VERSION)
+
+    message(WARNING "
+        The variable 'IS_ROS2_VERSION' was not used. You might want to set it to
+        specify which ROS 2 version should be used to compile the ROS 2 System Handle.
+        By default, a ROS 2 version from the sourced environment will be retrieved automatically.")
+
+        if ("$ENV{ROS_VERSION}" STREQUAL "1")
+            message(FATAL_ERROR "
+                A ROS 1 version was sourced last in your build environment.
+                Please consider using the 'IS_ROS2_VERSION' variable, or source a ROS 2 version before continuing!")
+        else()
+            set(IS_ROS2_VERSION $ENV{ROS_DISTRO})
+        endif()
+
+endif()
+
+message(STATUS "Compiling the ${PROJECT_NAME} System Handle for ROS 2 ${IS_ROS2_VERSION}...")
 
 # Get Integration Service dependencies
 find_package(xtypes REQUIRED)
@@ -99,7 +119,12 @@ enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
 compile_test(${PROJECT_NAME}_test_msgs SOURCE integration/ros2__test_msgs.cpp)
-compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
+
+if ("${IS_ROS2_VERSION}" STREQUAL "foxy")
+    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
+else()
+    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
+endif()
 
 set(test_msgs_config_file "ros2__test_msgs.yaml")
 
