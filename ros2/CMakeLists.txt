@@ -55,7 +55,7 @@ if(BUILD_LIBRARY)
             if ("$ENV{ROS_VERSION}" STREQUAL "1")
                 message(FATAL_ERROR "
                     A ROS 1 version was sourced last in your build environment.
-                    Please consider using the 'IS_ROS2_VERSION' variable, or source a ROS 2 version before continuing!")
+                    Please use the 'IS_ROS2_VERSION' variable!")
             else()
                 set(IS_ROS2_VERSION $ENV{ROS_DISTRO})
             endif()
