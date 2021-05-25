@@ -36,6 +36,30 @@ namespace ros2 {
 
 namespace {
 
+bool set_platform_env(
+        const std::string& variable,
+        const std::string& value,
+        const bool overwrite)
+{
+#ifdef WIN32
+    std::ostringstream aux_d;
+    aux_d << variable << "=" << value;
+    return (0 == _putenv(aux_d.str().c_str()));
+#else
+    return (0 == setenv(variable.c_str(), value.c_str(), overwrite));
+#endif // WIN32
+}
+
+int unset_platform_env(
+        const std::string& variable)
+{
+#ifdef WIN32
+    return set_platform_env(variable, "", false);
+#else
+    return (0 == unsetenv(variable.c_str()));
+#endif // WIN32
+}
+
 rmw_qos_profile_t parse_rmw_qos_configuration(
         const YAML::Node& /*configuration*/)
 {
@@ -118,6 +142,23 @@ bool SystemHandle::configure(
         }
         // TODO(@jamoralp) Warn if not set a custom node name unique for each node.
 
+        std::string previous_domain;
+        if (getenv("ROS_DOMAIN_ID") != nullptr)
+        {
+            previous_domain = getenv("ROS_DOMAIN_ID");
+        }
+
+        std::string domain = domain_node.as<std::string>();
+        success &= set_platform_env("ROS_DOMAIN_ID", domain.c_str(), true);
+
+        if (!success)
+        {
+            _logger << utils::Logger::Level::ERROR
+                    << "Failed to set ROS_DOMAIN_ID to " << domain << std::endl;
+
+            return false;
+        }
+
         /**
          * Since ROS2 Foxy, there is one participant per context.
          * Thus, to ensure isolation between nodes,
@@ -129,8 +170,6 @@ bool SystemHandle::configure(
         {
             init_options.auto_initialize_logging(false);
         }
-
-        init_options.set_domain_id(domain_node.as<size_t>());
 
         const char* context_argv[1];
         const std::string context_name("is_ros2_context_" + name);
@@ -148,7 +187,17 @@ bool SystemHandle::configure(
 
         _logger << utils::Logger::Level::INFO
                 << "Created node '" << ns << "/" << name << "' with Domain ID: "
-                << init_options.get_domain_id() << std::endl;
+                << _node_options->get_rcl_node_options()->domain_id << std::endl;
+
+
+        if (previous_domain.empty())
+        {
+            success &= unset_platform_env("ROS_DOMAIN_ID");
+        }
+        else
+        {
+            success &= set_platform_env("ROS_DOMAIN_ID", previous_domain.c_str(), true);
+        }
     }
     else
     {

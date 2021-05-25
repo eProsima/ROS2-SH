@@ -44,6 +44,26 @@ endif()
 # External dependencies for the Integration Service ROS 2 SystemHandle library
 ###################################################################################
 if(BUILD_LIBRARY)
+    # Check if the user specified which ROS 2 version he/she is using. If not, warn and try to automatically get it
+    if(NOT IS_ROS2_VERSION)
+
+        message(WARNING "
+            The variable 'IS_ROS2_VERSION' was not used. You might want to set it to
+            specify which ROS 2 version should be used to compile the ROS 2 System Handle.
+            By default, a ROS 2 version from the sourced environment will be retrieved automatically.")
+
+            if ("$ENV{ROS_VERSION}" STREQUAL "1")
+                message(FATAL_ERROR "
+                    A ROS 1 version was sourced last in your build environment.
+                    Please consider using the 'IS_ROS2_VERSION' variable, or source a ROS 2 version before continuing!")
+            else()
+                set(IS_ROS2_VERSION $ENV{ROS_DISTRO})
+            endif()
+
+    endif()
+
+    message(STATUS "Compiling the ${PROJECT_NAME} System Handle for ROS 2 ${IS_ROS2_VERSION}...")
+
     find_package(is-core REQUIRED)
     find_package(is-ros2-rosidl REQUIRED)
     find_package(rclcpp REQUIRED)
@@ -56,7 +76,7 @@ if(BUILD_LIBRARY)
     add_library(${PROJECT_NAME}
         SHARED
             src/Factory.cpp
-            src/SystemHandle.cpp
+            $<IF:$<STREQUAL:"${IS_ROS2_VERSION}","foxy">,src/SystemHandle__foxy.cpp,src/SystemHandle.cpp>
             src/MetaPublisher.cpp
         )
 
