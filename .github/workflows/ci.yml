@@ -4,10 +4,18 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'ros2/docs/**'
   pull_request:
     branches:
       - '**'
-
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'ros2/docs/**'
+ 
 jobs:
   ros2-sh_CI:
     strategy:
