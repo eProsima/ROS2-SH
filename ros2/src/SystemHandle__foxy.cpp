@@ -374,6 +374,15 @@ bool SystemHandle::subscribe(
 }
 
 //==============================================================================
+bool SystemHandle::is_internal_message(
+        void* /*filter_handle*/)
+{
+    // Always return false, since this should be handled by the ROS 2 RMW and the fact that
+    // we created the ROS 2 subscriptions with the "ignore_local_publications" flag set to true.
+    return false;
+}
+
+//==============================================================================
 std::shared_ptr<TopicPublisher> SystemHandle::advertise(
         const std::string& topic_name,
         const xtypes::DynamicType& message_type,
