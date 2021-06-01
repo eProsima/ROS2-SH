@@ -34,4 +34,3 @@ set(IS_ROS2_ROSIDL_GENERATE_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/scripts/is_ros2_ro
 set(IS_ROS2_ROSIDL_FIND_PACKAGE_INFO_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/scripts/is_ros2_rosidl_find_package_info.py")
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/is_ros2_rosidl_mix.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake/is_ros2_rosidl_install_extension.cmake")

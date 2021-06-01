@@ -29,17 +29,7 @@ if(NOT BUILD_LIBRARY)
 endif()
 
 find_package(is-core REQUIRED)
-find_package(rosidl_parser QUIET)
-
-if(NOT rosidl_parser_FOUND)
-
-    message(FATAL_ERROR
-        "Could not find package [rosidl_parser]. Without this, it will not be "
-        "possible to generate Integration Service translations for ROS2 message types. "
-        "Please source a distribution of ROS2 to build [${PROJECT_NAME}]."
-    )
-
-endif()
+find_package(rosidl_parser REQUIRED)
 
 include(GNUInstallDirs)
 

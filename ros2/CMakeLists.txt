@@ -65,7 +65,6 @@ if(BUILD_LIBRARY)
     message(STATUS "Compiling the ${PROJECT_NAME} System Handle for ROS 2 ${IS_ROS2_DISTRO}...")
 
     find_package(is-core REQUIRED)
-    find_package(is-ros2-rosidl REQUIRED)
     find_package(rclcpp REQUIRED)
 endif()
 
@@ -163,7 +162,8 @@ endif()
 # Install the Integration Service is-ros2-rosidl-mix plugin
 ###################################################################################
 if(BUILD_LIBRARY)
-    is_ros2_rosidl_install_extension(
+    is_mix_install_extension(
+        IDL_TYPE rosidl
         MIDDLEWARE
             ros2
         MESSAGE

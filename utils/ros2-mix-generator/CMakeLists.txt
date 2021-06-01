@@ -65,9 +65,8 @@ if (BUILD_TESTS OR BUILD_ROS2_TESTS)
 
     find_package(geometry_msgs REQUIRED)
     find_package(nav_msgs REQUIRED)
-    find_package(is_ros2_test_msg REQUIRED)
 
-    list(APPEND MIX_ROS_PACKAGES_LIST geometry_msgs nav_msgs is_ros2_test_msg)
+    list(APPEND MIX_ROS_PACKAGES_LIST geometry_msgs nav_msgs)
 
 endif()
 
