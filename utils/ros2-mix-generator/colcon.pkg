@@ -1,5 +1,5 @@
 {
     "name": "is-ros2-mix-generator",
     "type": "ros.cmake",
-    "dependencies": ["is-ros2-rosidl", "is-ros2"]
+    "dependencies": ["is-ros2"]
 }

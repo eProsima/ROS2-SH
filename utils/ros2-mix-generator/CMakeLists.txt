@@ -32,7 +32,9 @@ if(NOT BUILD_LIBRARY)
 endif()
 
 # Get dependencies
-find_package(is-ros2-rosidl REQUIRED)
+#find_package(is-ros2-rosidl REQUIRED)
+find_package(is-core REQUIRED)
+find_package(rosidl_parser REQUIRED)
 find_package(is-ros2 REQUIRED)
 
 list(APPEND MIX_ROS_PACKAGES_LIST std_msgs)
@@ -69,6 +71,8 @@ if (BUILD_TESTS OR BUILD_ROS2_TESTS)
     list(APPEND MIX_ROS_PACKAGES_LIST geometry_msgs nav_msgs)
 
 endif()
+
+include(cmake/is_ros2_rosidl_mix.cmake)
 
 is_ros2_rosidl_mix(
     PACKAGES ${MIX_ROS_PACKAGES_LIST}
