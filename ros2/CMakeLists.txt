@@ -162,7 +162,7 @@ endif()
 ###################################################################################
 if(BUILD_LIBRARY)
     if(BUILD_TESTS OR BUILD_ROS2_TESTS)
-        add_subdirectory(tests)
+        add_subdirectory(test)
     endif()
 endif()
 
