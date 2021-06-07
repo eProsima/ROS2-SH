@@ -15,7 +15,7 @@ on:
       - '**.md'
       - 'docs/**'
       - 'ros2/docs/**'
- 
+
 jobs:
   ros2-sh_CI:
     strategy:
@@ -46,5 +46,5 @@ jobs:
 
       - name: Test
         run: |
-          . /opt/ros/${{ matrix.node }}/setup.sh && . install/local_setup.sh && colcon test --packages-up-to is-ros2-test --event-handlers console_direct+
+          . /opt/ros/${{ matrix.node }}/setup.sh && . install/local_setup.sh && colcon test --packages-select is-ros2 --event-handlers console_direct+
           colcon test-result
