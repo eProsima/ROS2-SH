@@ -149,29 +149,21 @@ if(BUILD_LIBRARY)
             rclcpp
         )
 
-    install(
-        DIRECTORY
+    file(
+        COPY
             ${CMAKE_CURRENT_LIST_DIR}/include/
         DESTINATION
-            ${CMAKE_INSTALL_INCLUDEDIR}
-        COMPONENT
-            ${PROJECT_NAME}
-        )
+            ${CMAKE_INSTALL_PREFIX}/include/
+    )
 endif()
+
 ###################################################################################
-# Install the Integration Service is-ros2-rosidl-mix plugin
+# Integration Service ROS 2 SystemHandle tests
 ###################################################################################
 if(BUILD_LIBRARY)
-    is_mix_install_extension(
-        IDL_TYPE rosidl
-        MIDDLEWARE
-            ros2
-        MESSAGE
-            SOURCES "${CMAKE_CURRENT_LIST_DIR}/resources/convert__msg.cpp.em"
-            HEADERS "${CMAKE_CURRENT_LIST_DIR}/resources/convert__msg.hpp.em"
-        SERVICE
-            SOURCES "${CMAKE_CURRENT_LIST_DIR}/resources/convert__srv.cpp.em"
-    )
+    if(BUILD_TESTS OR BUILD_ROS2_TESTS)
+        add_subdirectory(tests)
+    endif()
 endif()
 
 ###################################################################################

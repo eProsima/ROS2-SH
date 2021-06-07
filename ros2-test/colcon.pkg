@@ -1,5 +1,0 @@
-{
-    "name": "is-ros2-test",
-    "type": "ros.cmake",
-    "dependencies": ["xtypes", "is-core", "is-ros2-rosidl", "is-mock", "is-ros2", "geometry_msgs", "nav_msgs", "is-ros2-mix-generator"]
-}
