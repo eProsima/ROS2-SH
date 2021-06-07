@@ -74,7 +74,6 @@ endif()
 ###################################################################################
 # Install the Integration Service is-ros2-rosidl-mix plugin
 ###################################################################################
-message(WARNING "RESOURCES PATH ${CMAKE_CURRENT_LIST_DIR}/resources/")
 is_mix_install_extension(
     IDL_TYPE rosidl
     MIDDLEWARE
