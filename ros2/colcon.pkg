@@ -1,5 +1,0 @@
-{
-    "name": "is-ros2",
-    "type": "ros.cmake",
-    "dependencies": ["xtypes", "is-core", "is-mock"]
-}

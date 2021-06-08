@@ -57,7 +57,8 @@ std::string get_type_name(T type)
     int status;
     std::string tname = typeid(T).name();
     char *demangled_name = abi::__cxa_demangle(tname.c_str(), NULL, NULL, &status);
-    if (status == 0) {
+    if (status == 0)
+    {
         tname = demangled_name;
     }
     std::size_t found = tname.find("_<");
@@ -70,9 +71,13 @@ std::string get_type_name(T type)
             tname = tname.replace(found, 5, "");
         }
         size_t index = 0;
-        while (true) {
+        while (true)
+        {
             index = tname.find("::", index);
-            if (index == std::string::npos) break;
+            if (index == std::string::npos)
+            {
+                break;
+            }
             tname.replace(index, 2, "/");
             index += 2;
         }
@@ -111,11 +116,11 @@ public:
         yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
         yaml += "topics:\n";
         yaml += "   transmit: { type: '";
-            yaml += get_type_name<T>(T());
-            yaml += "', route: ros2_to_mock }\n";
+        yaml += get_type_name<T>(T());
+        yaml += "', route: ros2_to_mock }\n";
         yaml += "   echo: { type: '";
-            yaml += get_type_name<T>(T());
-            yaml += "', route: mock_to_ros2 }\n";
+        yaml += get_type_name<T>(T());
+        yaml += "', route: mock_to_ros2 }\n";
 
         std::cout << "YAML " << yaml << std::endl;
 
@@ -265,11 +270,11 @@ public:
         }
         else if (std::is_same<T, std_msgs::msg::Byte>::value)
         {
-            primitive.data = std::uniform_int_distribution<uint16_t>()(rng);
+            primitive.data = std::uniform_int_distribution<uint8_t>()(rng);
         }
         else if (std::is_same<T, std_msgs::msg::Char>::value)
         {
-            primitive.data = std::uniform_int_distribution<uint16_t>()(rng);
+            primitive.data = std::uniform_int_distribution<uint8_t>()(rng);
         }
         else if (std::is_same<T, std_msgs::msg::Int8>::value)
         {
@@ -318,7 +323,8 @@ public:
 
 using ROS2PrimitiveTypes = testing::Types<std_msgs::msg::Bool, std_msgs::msg::Byte, std_msgs::msg::Char,
     std_msgs::msg::Int8, std_msgs::msg::Int16, std_msgs::msg::Int32, std_msgs::msg::Int64, std_msgs::msg::UInt8,
-    std_msgs::msg::UInt16, std_msgs::msg::UInt32, std_msgs::msg::UInt64>;
+    std_msgs::msg::UInt16, std_msgs::msg::UInt32, std_msgs::msg::UInt64, std_msgs::msg::Float32,
+    std_msgs::msg::Float64>;
 TYPED_TEST_CASE(ROS2, ROS2PrimitiveTypes);
 
 TYPED_TEST(ROS2, Transmit_and_receive_primitive_messages)
