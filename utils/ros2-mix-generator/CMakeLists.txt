@@ -32,7 +32,8 @@ if(NOT BUILD_LIBRARY)
 endif()
 
 # Get dependencies
-find_package(is-ros2-rosidl REQUIRED)
+find_package(is-core REQUIRED)
+find_package(rosidl_parser REQUIRED)
 find_package(is-ros2 REQUIRED)
 
 list(APPEND MIX_ROS_PACKAGES_LIST std_msgs)
@@ -65,11 +66,26 @@ if (BUILD_TESTS OR BUILD_ROS2_TESTS)
 
     find_package(geometry_msgs REQUIRED)
     find_package(nav_msgs REQUIRED)
-    find_package(is_ros2_test_msg REQUIRED)
 
-    list(APPEND MIX_ROS_PACKAGES_LIST geometry_msgs nav_msgs is_ros2_test_msg)
+    list(APPEND MIX_ROS_PACKAGES_LIST geometry_msgs nav_msgs)
 
 endif()
+
+###################################################################################
+# Install the Integration Service is-ros2-rosidl-mix plugin
+###################################################################################
+is_mix_install_extension(
+    IDL_TYPE rosidl
+    MIDDLEWARE
+        ros2
+    MESSAGE
+        SOURCES "${CMAKE_CURRENT_LIST_DIR}/resources/convert__msg.cpp.em"
+        HEADERS "${CMAKE_CURRENT_LIST_DIR}/resources/convert__msg.hpp.em"
+    SERVICE
+        SOURCES "${CMAKE_CURRENT_LIST_DIR}/resources/convert__srv.cpp.em"
+)
+
+include(cmake/is_ros2_rosidl_mix.cmake)
 
 is_ros2_rosidl_mix(
     PACKAGES ${MIX_ROS_PACKAGES_LIST}

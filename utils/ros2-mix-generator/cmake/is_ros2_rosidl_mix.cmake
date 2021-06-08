@@ -73,9 +73,9 @@ function(is_ros2_rosidl_mix)
             INTERPRETER
                 ${PYTHON_EXECUTABLE}
             FIND
-                ${IS_ROS2_ROSIDL_FIND_PACKAGE_INFO_SCRIPT}
+                ${CMAKE_CURRENT_LIST_DIR}/scripts/is_ros2_rosidl_find_package_info.py
             GENERATE
-                ${IS_ROS2_ROSIDL_GENERATE_SCRIPT}
+                ${CMAKE_CURRENT_LIST_DIR}/scripts/is_ros2_rosidl_generate.py
         PACKAGES
             ${_ARG_PACKAGES}
         MIDDLEWARES
