@@ -1,0 +1,11 @@
+systems:
+  ros2: { type: ros2 }
+  mock: { type: mock, types-from: ros2 }
+
+routes:
+  mock_srv: { server: mock, clients: ros2 }
+  ros2_srv: { server: ros2, clients: mock }
+
+services:
+  get_plan: { type: "nav_msgs/GetPlan:request", route: ros2_srv }
+  echo_plan: { type: "nav_msgs/GetPlan:response", route: mock_srv }
