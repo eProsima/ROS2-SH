@@ -88,19 +88,26 @@ geometry_msgs::msg::PoseStamped generate_random_pose(
 }
 
 void transform_pose_msg(
+        const geometry_msgs::msg::Pose& pose,
+        xtypes::WritableDynamicDataRef to)
+{
+    to["position"]["x"] = pose.position.x;
+    to["position"]["y"] = pose.position.y;
+    to["position"]["z"] = pose.position.z;
+    to["orientation"]["x"] = pose.orientation.x;
+    to["orientation"]["y"] = pose.orientation.y;
+    to["orientation"]["z"] = pose.orientation.z;
+    to["orientation"]["w"] = pose.orientation.w;
+}
+
+void transform_pose_msg_stamped(
         const geometry_msgs::msg::PoseStamped& p,
         xtypes::WritableDynamicDataRef to)
 {
     to["header"]["stamp"]["sec"] = p.header.stamp.sec;
     to["header"]["stamp"]["nanosec"] = p.header.stamp.nanosec;
     to["header"]["frame_id"] = "map";
-    to["pose"]["position"]["x"] = p.pose.position.x;
-    to["pose"]["position"]["y"] = p.pose.position.y;
-    to["pose"]["position"]["z"] = p.pose.position.z;
-    to["pose"]["orientation"]["x"] = p.pose.orientation.x;
-    to["pose"]["orientation"]["y"] = p.pose.orientation.y;
-    to["pose"]["orientation"]["z"] = p.pose.orientation.z;
-    to["pose"]["orientation"]["w"] = p.pose.orientation.w;
+    transform_pose_msg(p.pose, to["pose"]);
 }
 
 xtypes::DynamicData generate_plan_request_msg(
@@ -111,8 +118,8 @@ xtypes::DynamicData generate_plan_request_msg(
 {
     xtypes::DynamicData message(request_type);
 
-    transform_pose_msg(goal, message["goal"]);
-    transform_pose_msg(start, message["start"]);
+    transform_pose_msg_stamped(goal, message["goal"]);
+    transform_pose_msg_stamped(start, message["start"]);
     message["tolerance"] = tolerance;
 
     return message;
@@ -170,6 +177,59 @@ void compare_plans(
                    << print_pose(plan_a.poses[i]) << std::endl;
         }
     }
+}
+
+TEST(ROS2, Filter_internal_messages)
+{
+    using namespace std::chrono_literals;
+
+    const double tolerance = 1e-8;
+
+    YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__LOOPBACK__TEST_CONFIG);
+
+    is::core::InstanceHandle handle = is::run_instance(
+        config_node, {ROS2__ROSIDL__BUILD_DIR});
+
+    ASSERT_TRUE(handle);
+
+    std::promise<xtypes::DynamicData> msg_promise;
+    std::future<xtypes::DynamicData> msg_future = msg_promise.get_future();
+    std::mutex mock_sub_mutex;
+    bool mock_sub_value_received = false;
+    auto mock_sub = [&](const xtypes::DynamicData& msg)
+            {
+                std::unique_lock<std::mutex> lock(mock_sub_mutex);
+                if (mock_sub_value_received)
+                {
+                    return;
+                }
+
+                mock_sub_value_received = true;
+                msg_promise.set_value(msg);
+            };
+    ASSERT_TRUE(is::sh::mock::subscribe("echo_pose", mock_sub));
+
+    geometry_msgs::msg::Pose ros2_pose = generate_random_pose().pose;
+    // Get topic type from ros2 middleware
+    const is::TypeRegistry& ros2_types = *handle.type_registry("ros2");
+    const xtypes::DynamicType& topic_type = *ros2_types.at("geometry_msgs/Pose");
+    xtypes::DynamicData xtypes_pose(topic_type);
+    transform_pose_msg(ros2_pose, xtypes_pose);
+
+    is::sh::mock::publish_message("transmit_pose", xtypes_pose);
+
+    // Since Integration Service should block local publications within the SystemHandle,
+    // the message should never return back from ROS 2.
+    ASSERT_NE(std::future_status::ready, msg_future.wait_for(5s));
+
+    // Quit and wait for no more than a minute. We don't want the test to get
+    // hung here indefinitely in the case of an error.
+    handle.quit().wait_for(1min);
+
+    // Require that it's no longer running. If it is still running, then it is
+    // probably stuck, and we should forcefully quit.
+    ASSERT_TRUE(!handle.running());
+    ASSERT_TRUE(handle.wait() == 0);
 }
 
 TEST(ROS2, Publish_subscribe_between_ros2_and_mock)
