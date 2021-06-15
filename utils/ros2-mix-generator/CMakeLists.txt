@@ -26,8 +26,16 @@ project(is-ros2-mix-generator)
 # Configure options
 ###################################################################################
 option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+set(IS_ROS2_SH_MODE "Static" CACHE STRING "Select the ROS 2 SystemHandle Mode")
 
 if(NOT BUILD_LIBRARY)
+    return()
+endif()
+
+set(IS_ROS2_SH_MODE_LOWERCASE "" CACHE STRING "Build mode to lowercase")
+string(TOLOWER "${IS_ROS2_SH_MODE}" IS_ROS2_SH_MODE_LOWERCASE)
+
+if("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "dynamic")
     return()
 endif()
 
