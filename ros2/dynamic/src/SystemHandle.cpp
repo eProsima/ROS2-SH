@@ -467,7 +467,7 @@ public:
                                     else if (0 == WEXITSTATUS(st))
                                     {
                                         logger_ << is::utils::Logger::Level::INFO
-                                                << "ROS2 Type Supports generation finishedfor package '"
+                                                << "ROS2 Type Supports generation finished for package '"
                                                 << package_name << "', installedin path "
                                                 << path << std::endl;
                                     }
