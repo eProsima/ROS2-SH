@@ -187,7 +187,7 @@ public:
         {
             // Check if there are paths to custom idls
             std::regex reg("/opt/ros/([a-z])+/share/*");
-            for (auto& path : types_node["paths"])
+            for (const auto& path : types_node["paths"])
             {
                 if (!std::regex_match (path.as<std::string>(), reg))
                 {
