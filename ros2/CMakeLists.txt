@@ -65,7 +65,7 @@ if(BUILD_LIBRARY)
         add_subdirectory(static)
     elseif("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "dynamic")
         add_subdirectory(dynamic)
-    else
+    else()
         message(WARNING "Invalid mode selected. Please choose between 'static' or 'dynamic'")
     endif()
 endif()
