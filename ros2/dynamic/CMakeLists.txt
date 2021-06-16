@@ -145,9 +145,9 @@ file(
 ###################################################################################
 # Integration Service ROS 2 SystemHandle tests
 ###################################################################################
-# if(BUILD_TESTS OR BUILD_ROS2_TESTS)
-#   add_subdirectory(test)
-# endif()
+if(BUILD_TESTS OR BUILD_ROS2_TESTS)
+  add_subdirectory(test)
+endif()
 
 ###################################################################################
 # Integration Service ROS 2 SystemHandle API Reference
