@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _IS_SH_FASTDDS__INTERNAL__ROS2MIDDLEWAREEXCEPTION_HPP_
-#define _IS_SH_FASTDDS__INTERNAL__ROS2MIDDLEWAREEXCEPTION_HPP_
+#ifndef _IS_SH_ROS2_DYNAMIC__INTERNAL__ROS2MIDDLEWAREEXCEPTION_HPP_
+#define _IS_SH_ROS2_DYNAMIC__INTERNAL__ROS2MIDDLEWAREEXCEPTION_HPP_
 
 #include <stdexcept>
 
@@ -30,7 +30,7 @@ namespace ros2 {
 /**
  * @class ROS2MiddlewareException
  *        Launches a runtime error every time an unexpected behavior occurs
- *        related to *Fast DDS* middleware, when configuring or using this is::SystemHandle.
+ *        related to *ROS 2 Dynamic* middleware, when configuring or using this is::SystemHandle.
  */
 class ROS2MiddlewareException : public std::runtime_error
 {
@@ -59,4 +59,4 @@ public:
 } //  namespace is
 } //  namespace eprosima
 
-#endif //  _IS_SH_FASTDDS__INTERNAL__ROS2MIDDLEWAREEXCEPTION_HPP_
+#endif //  _IS_SH_ROS2_DYNAMIC__INTERNAL__ROS2MIDDLEWAREEXCEPTION_HPP_

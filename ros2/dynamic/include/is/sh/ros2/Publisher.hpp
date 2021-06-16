@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _IS_SH_FASTDDS__INTERNAL__PUBLISHER_HPP_
-#define _IS_SH_FASTDDS__INTERNAL__PUBLISHER_HPP_
+#ifndef _IS_SH_ROS2_DYNAMIC__INTERNAL__PUBLISHER_HPP_
+#define _IS_SH_ROS2_DYNAMIC__INTERNAL__PUBLISHER_HPP_
 
 #include "ROS2MiddlewareException.hpp"
 #include "Participant.hpp"
@@ -42,7 +42,7 @@ class Participant;
 /**
  * @class Publisher
  *        This class represents a <a href="https://fast-dds.docs.eprosima.com/en/latest/fastdds/dds_layer/publisher/publisher.html">
- *        Fast DDS Publisher</a> within the *Integration Service* framework.
+ *        ROS 2 Publisher</a> implemented using FastDDS within the *Integration Service* framework.
  *
  *        Its topic type definition and data instances are represented by means
  *        of the <a href="https://fast-dds.docs.eprosima.com/en/latest/fastdds/dynamic_types/dynamic_types.html">
@@ -149,4 +149,4 @@ private:
 } //  namespace is
 } //  namespace eprosima
 
-#endif //  _IS_SH_FASTDDS__INTERNAL__PARTICIPANT_HPP_
+#endif //  _IS_SH_ROS2_DYNAMIC__INTERNAL__PARTICIPANT_HPP_

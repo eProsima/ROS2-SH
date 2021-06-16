@@ -56,7 +56,7 @@ public:
 
     SystemHandle()
         : FullSystem()
-        , logger_("is::sh::ROS2 Dynamic")
+        , logger_("is::sh::ROS2_Dynamic")
     {
     }
 
@@ -75,7 +75,7 @@ public:
             TypeRegistry& /*type_registry*/) override
     {
         /*
-         * The Fast-DDS sh doesn't define new types.
+         * The ROS 2 Dynamic SH doesn't define new types.
          * Needed types will be defined in the 'types' section of the YAML file, and hence,
          * already registered in the 'TypeRegistry' by the *Integration Service core*.
          */
@@ -200,7 +200,7 @@ public:
 
         if(types_node["idls"])
         {
-            for (auto& entry: types_node["idls"])
+            for (const auto& entry : types_node["idls"])
             {
                  logger_ << utils::Logger::Level::DEBUG
                                 << "IDL: " << Dump(entry) << std::endl;
@@ -216,7 +216,7 @@ public:
                 std::sregex_iterator end;
 
                 logger_ << utils::Logger::Level::DEBUG
-                                << "Searching include clauses..." << std::endl;
+                        << "Searching include clauses..." << std::endl;
 
                 while (iter != end)
                 {
@@ -225,7 +225,7 @@ public:
                         // On each include extracts the package_name
                         std::string incl = (*iter)[i];
                         logger_ << utils::Logger::Level::DEBUG
-                                    << "Include Clause: " << incl << std::endl;
+                                << "Include Clause: " << incl << std::endl;
 
                         std::regex pkg_reg("[<\"][^>\"/]*[/]");
                         std::cmatch cm;
@@ -262,10 +262,10 @@ public:
                             std::regex_search(incl.c_str(), cm1, path_reg);
                             std::string in_path = cm1[0];
                             in_path = in_path.substr(1, in_path.length() - 2);
-                            for (auto& path: include_paths)
+                            for (const auto& path : include_paths)
                             {
                                 logger_ << utils::Logger::Level::DEBUG
-                                    << "Looking for file " << in_path << " within path " << path << std::endl;
+                                        << "Looking for file " << in_path << " within path " << path << std::endl;
                                 if (std::filesystem::exists(path + in_path))
                                 {
                                     logger_ << utils::Logger::Level::DEBUG
@@ -300,7 +300,7 @@ public:
                     if (modules == 0)
                     {
                         logger_ << utils::Logger::Level::ERROR
-                                << "The type doesn't have module. Please follow the ROS2 naming convention."
+                                << "The type is not declared within an IDL module. Please follow the ROS 2 naming convention."
                                 << std::endl;
 
                         return false;
@@ -308,8 +308,8 @@ public:
                     else if (modules > 1)
                     {
                         logger_ << utils::Logger::Level::ERROR
-                                << "There can only be one module per idl, add"
-                                << " another entry in the YAML idls tag." << std::endl;
+                                << "There can only be one module per IDL, add"
+                                << " another entry in the YAML `idls` tag." << std::endl;
 
                         return false;
                     }
@@ -339,7 +339,8 @@ public:
                                 if (!mod.has_submodule("msg") && !mod.has_submodule("srv"))
                                 {
                                     logger_ << utils::Logger::Level::ERROR
-                                            << "The type must have a module msg or srv."
+                                            << "The module '" << mod.name()
+                                            << "' must be followed by a 'msg' or 'srv' submodule prior to declaring the type."
                                             << std::endl;
                                     is_success = false;
                                     return;
@@ -389,21 +390,21 @@ public:
                                 idlfile << idl << std::endl;
                                 idlfile.close();
 
-                                for (auto& mv_idl: custom_include_paths)
+                                for (const auto& mv_idl : custom_include_paths)
                                 {
                                     std::string filename = std::filesystem::path(mv_idl).filename();
                                     std::string path = std::filesystem::path(tmp / mod.name() / "msg" / filename);
                                     logger_ << utils::Logger::Level::DEBUG
-                                        << "The file " << filename << " has been copied to " << path
-                                        << std::endl;
+                                            << "The file " << filename << " has been copied to " << path
+                                            << std::endl;
                                     if (!std::filesystem::exists(path))
                                     {
                                         std::filesystem::copy(mv_idl, path);
                                     }
                                 }
 
-                                std::string package_name = "--package_name " + mod.name();
-                                std::string path = "--install_path /opt/ros/" + ROS2_DISTRO;
+                                const std::string package_name = "--package_name " + mod.name();
+                                const std::string path = "--install_path /opt/ros/" + ROS2_DISTRO;
 
                                 logger_ << is::utils::Logger::Level::INFO
                                         << "Generating ROS2 Type Support for package: " << package_name
@@ -415,7 +416,7 @@ public:
                                 {
                                     std::ostringstream stream;
                                     std::copy(ros2_modules.begin(), ros2_modules.end(), std::ostream_iterator<std::string>(stream, ";"));
-                                    std::string depends = "--depedencies \"" + stream.str() + "\"";
+                                    const std::string depends = "--dependencies \"" + stream.str() + "\"";
 
                                     logger_ << is::utils::Logger::Level::DEBUG
                                         << "ROS2 Type Support Dependencies [" << depends
@@ -450,8 +451,8 @@ public:
                                     if (1 == WEXITSTATUS(st))
                                     {
                                         logger_ << is::utils::Logger::Level::ERROR
-                                                << "Failed to generate the Type Support for package " << package_name
-                                                << ". Make sure you follow all the ROS2 naming and structure convention"
+                                                << "Failed to generate the Type Support for package '" << package_name
+                                                << "'. Make sure you follow all the ROS2 naming and structure convention"
                                                 << " rules" << std::endl;
 
                                         if (logger_.get_level() != is::utils::Logger::Level::DEBUG)
@@ -466,7 +467,8 @@ public:
                                     else if (0 == WEXITSTATUS(st))
                                     {
                                         logger_ << is::utils::Logger::Level::INFO
-                                                << "ROS2 Type Supports generation finished. Installed in path "
+                                                << "ROS2 Type Supports generation finishedfor package '"
+                                                << package_name << "', installedin path "
                                                 << path << std::endl;
                                     }
 

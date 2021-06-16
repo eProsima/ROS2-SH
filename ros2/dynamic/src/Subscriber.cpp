@@ -50,7 +50,7 @@ Subscriber::Subscriber(
     , reception_threads_()
     , stop_cleaner_(false)
     , cleaner_thread_(&Subscriber::cleaner_function, this)
-    , logger_("is::sh::ROS2 Dynamic::Subscriber")
+    , logger_("is::sh::ROS2_Dynamic::Subscriber")
 {
     // Adds the type name mangling
     std::string type_name = message_type.name();
@@ -192,7 +192,7 @@ void Subscriber::receive(
         const fastrtps::types::DynamicData* dds_message)
 {
     logger_ << utils::Logger::Level::INFO
-            << "Receiving message from DDS for topic '" << topic_name_ << "'" << std::endl;
+            << "Receiving message from ROS 2 for topic '" << topic_name_ << "'" << std::endl;
 
     ::xtypes::DynamicData is_message(message_type_);
     bool success = Conversion::fastdds_to_xtypes(dds_message, is_message);
@@ -208,7 +208,7 @@ void Subscriber::receive(
     else
     {
         logger_ << utils::Logger::Level::ERROR
-                << "Failed to convert message from DDS to Integration Service for topic '"
+                << "Failed to convert message from ROS 2 to Integration Service for topic '"
                 << topic_name_ << "'" << std::endl;
     }
 

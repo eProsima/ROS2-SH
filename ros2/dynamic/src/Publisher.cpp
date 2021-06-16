@@ -37,7 +37,7 @@ Publisher::Publisher(
         const YAML::Node& config)
     : participant_(participant)
     , topic_name_(topic_name)
-    , logger_("is::sh::ROS2 Dynamic::Publisher")
+    , logger_("is::sh::ROS2_Dynamic::Publisher")
 {
 
     // Adds the type name mangling
@@ -122,13 +122,6 @@ Publisher::Publisher(
 
     // Create DDS datawriter
     ::fastdds::dds::DataWriterQos datawriter_qos = ::fastdds::dds::DATAWRITER_QOS_DEFAULT;
-    if (config["service_instance_name"])
-    {
-        fastrtps::rtps::Property instance_property;
-        instance_property.name("dds.rpc.service_instance_name");
-        instance_property.value(config["service_instance_name"].as<std::string>());
-        datawriter_qos.properties().properties().emplace_back(std::move(instance_property));
-    }
 
     dds_datawriter_ = dds_publisher_->create_datawriter(dds_topic_, datawriter_qos, this);
     if (dds_datawriter_)
@@ -169,7 +162,7 @@ bool Publisher::publish(
     std::unique_lock<std::mutex> lock(data_mtx_);
 
     logger_ << utils::Logger::Level::INFO
-            << "Sending message from Integration Service to DDS for topic '" << topic_name_ << "': "
+            << "Sending message from Integration Service to ROS 2 for topic '" << topic_name_ << "': "
             << "[[ " << message << " ]]" << std::endl;
 
     bool success = Conversion::xtypes_to_fastdds(message, dynamic_data_);
@@ -180,7 +173,7 @@ bool Publisher::publish(
     else
     {
         logger_ << utils::Logger::Level::ERROR
-                << "Failed to convert message from Integration Service to DDS for topic '"
+                << "Failed to convert message from Integration Service to ROS 2 for topic '"
                 << topic_name_ << "': [[ " << message << " ]]" << std::endl;
     }
 

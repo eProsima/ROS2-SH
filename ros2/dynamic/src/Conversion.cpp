@@ -43,7 +43,7 @@ std::map<std::string, DynamicPubSubType*> Conversion::registered_types_;
 std::map<std::string, DynamicTypeBuilder_ptr> Conversion::builders_;
 
 // Static member initialization
-utils::Logger NavigationNode::logger_("is::sh::ROS2 Dynamic::Conversion::NavigationNode");
+utils::Logger NavigationNode::logger_("is::sh::ROS2_Dynamic::Conversion::NavigationNode");
 
 std::string NavigationNode::get_path()
 {
@@ -319,7 +319,7 @@ std::shared_ptr<NavigationNode> NavigationNode::get_discriminator(
 }
 
 // Static member initialization
-utils::Logger Conversion::logger_("is::sh::ROS2 Dynamic::Conversion");
+utils::Logger Conversion::logger_("is::sh::ROS2_Dynamic::Conversion");
 
 // This function patches the problem of dynamic types, which do not admit '/' in their type name.
 std::string Conversion::convert_type_name(

@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _IS_SH_FASTDDS__INTERNAL__SUBSCRIBER_HPP_
-#define _IS_SH_FASTDDS__INTERNAL__SUBSCRIBER_HPP_
+#ifndef _IS_SH_ROS2_DYNAMIC__INTERNAL__SUBSCRIBER_HPP_
+#define _IS_SH_ROS2_DYNAMIC__INTERNAL__SUBSCRIBER_HPP_
 
 #include "ROS2MiddlewareException.hpp"
 #include "Participant.hpp"
@@ -44,7 +44,7 @@ class Participant;
 /**
  * @class Subscriber
  *        This class represents a <a href="https://fast-dds.docs.eprosima.com/en/latest/fastdds/dds_layer/subscriber/subscriber.html">
- *        Fast DDS Subscriber</a> within the *Integration Service* framework.
+ *        ROS 2 Subscriber</a> implemented using FastDDS within the *Integration Service* framework.
  *
  *        Its topic type definition and data instances are represented by means
  *        of the <a href="https://fast-dds.docs.eprosima.com/en/latest/fastdds/dynamic_types/dynamic_types.html">
@@ -172,4 +172,4 @@ private:
 } //  namespace is
 } //  namespace eprosima
 
-#endif // SOSS__DDS__INTERNAL__SUBSCRIBER_HPP
+#endif // _IS_SH_ROS2_DYNAMIC__INTERNAL__SUBSCRIBER_HPP

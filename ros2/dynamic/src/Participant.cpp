@@ -33,7 +33,7 @@ namespace ros2 {
 
 Participant::Participant()
     : dds_participant_(nullptr)
-    , logger_("is::sh::ROS2 Dynamic::Participant")
+    , logger_("is::sh::ROS2_Dynamic::Participant")
 {
     build_participant();
 }
@@ -41,7 +41,7 @@ Participant::Participant()
 Participant::Participant(
         const YAML::Node& config)
     : dds_participant_(nullptr)
-    , logger_("is::sh::ROS2 Dynamic::Participant")
+    , logger_("is::sh::ROS2_Dynamic::Participant")
 {
     ::fastdds::dds::DomainId_t domain_id = 0;
     std::string node_name = "default_IS-ROS2-Dynamic-SH_participant";

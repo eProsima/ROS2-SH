@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _IS_SH_FASTDDS__INTERNAL__PARTICIPANT_HPP_
-#define _IS_SH_FASTDDS__INTERNAL__PARTICIPANT_HPP_
+#ifndef _IS_SH_ROS2_DYNAMIC__INTERNAL__PARTICIPANT_HPP_
+#define _IS_SH_ROS2_DYNAMIC__INTERNAL__PARTICIPANT_HPP_
 
 #include "ROS2MiddlewareException.hpp"
 
@@ -40,7 +40,7 @@ namespace ros2 {
 
 /**
  * @class Participant
- *        This class represents a ROS2 Dynamic Node within the *Integration Service* framework.
+ *        This class represents a ROS 2 Dynamic Node within the *Integration Service* framework.
  *
  * @details It includes a mapping of the topic names to their corresponding
  *          <a href="https://fast-dds.docs.eprosima.com/en/latest/fastdds/dynamic_types/dynamic_types.html">
@@ -213,4 +213,4 @@ private:
 } //  namespace is
 } //  namespace eprosima
 
-#endif //  _IS_SH_FASTDDS__INTERNAL__PARTICIPANT_HPP_
+#endif //  _IS_SH_ROS2_DYNAMIC__INTERNAL__PARTICIPANT_HPP_
