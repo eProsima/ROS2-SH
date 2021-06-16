@@ -37,7 +37,7 @@ This *System Handle* can be used for two main purposes:
 
 This section provides a list of the dependencies needed in order to compile *ROS 2 System Handle*.
 
-* [ROS 2](https://docs.ros.org/en/foxy/Installation.html): *Foxy ROS 2* distribution.
+* [ROS 2](https://docs.ros.org/en/foxy/Installation.html): *Foxy/Galactic ROS 2* distribution.
 
 ## Configuration
 
