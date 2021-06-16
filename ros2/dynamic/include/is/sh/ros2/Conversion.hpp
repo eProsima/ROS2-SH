@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _IS_SH_FASTDDS__INTERNAL__CONVERSION_HPP_
-#define _IS_SH_FASTDDS__INTERNAL__CONVERSION_HPP_
+#ifndef _IS_SH_ROS2_DYNAMIC__INTERNAL__CONVERSION_HPP_
+#define _IS_SH_ROS2_DYNAMIC__INTERNAL__CONVERSION_HPP_
 
 #include <fastrtps/types/DynamicType.h>
 #include <fastrtps/types/DynamicTypeBuilder.h>
@@ -229,5 +229,5 @@ private:
 } //  namespace is
 } //  namespace eprosima
 
-#endif //  _IS_SH_FASTDDS__INTERNAL__CONVERSION_HPP_
+#endif //  _IS_SH_ROS2_DYNAMIC__INTERNAL__CONVERSION_HPP_
 
