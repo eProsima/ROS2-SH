@@ -189,7 +189,8 @@ Subscriber::~Subscriber()
 }
 
 void Subscriber::receive(
-        const fastrtps::types::DynamicData* dds_message)
+        const fastrtps::types::DynamicData* dds_message,
+        ::fastdds::dds::SampleInfo sample_info)
 {
     logger_ << utils::Logger::Level::INFO
             << "Receiving message from ROS 2 for topic '" << topic_name_ << "'" << std::endl;
@@ -203,7 +204,7 @@ void Subscriber::receive(
         logger_ << utils::Logger::Level::INFO
                 << "Received message: [[ " << is_message << " ]]" << std::endl;
 
-        (*is_callback_)(is_message);
+        (*is_callback_)(is_message, static_cast<void*>(&sample_info));
     }
     else
     {
@@ -240,7 +241,7 @@ void Subscriber::on_data_available(
                     << "Processing incoming data available for topic '"
                     << topic_name_ << "'" << std::endl;
 
-            std::thread* thread = new std::thread(&Subscriber::receive, this, dynamic_data_);
+            std::thread* thread = new std::thread(&Subscriber::receive, this, dynamic_data_, info);
             reception_threads_.emplace(thread->get_id(), thread);
         }
         else
