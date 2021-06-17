@@ -91,7 +91,8 @@ set(test_msgs_config_file "ros2__test_msgs.yaml")
 set_property(
     TARGET ${PROJECT_NAME}_geometry_msgs ${PROJECT_NAME}_test_domain ${PROJECT_NAME}_primitive_msgs
     APPEND PROPERTY COMPILE_DEFINITIONS PRIVATE
-        "ROS2__GEOMETRY_MSGS__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs.yaml\""
+        "ROS2__GEOMETRY_MSGS__PUBSUB__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs__pubsub.yaml\""
+        "ROS2__GEOMETRY_MSGS__SERVICES__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs__services.yaml\""
         "ROS2__TEST_DOMAIN__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__domain_change.yaml\""
         "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
     )

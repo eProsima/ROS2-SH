@@ -178,7 +178,7 @@ TEST(ROS2, Publish_subscribe_between_ros2_and_mock)
 
     const double tolerance = 1e-8;
 
-    YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__TEST_CONFIG);
+    YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__PUBSUB__TEST_CONFIG);
 
     is::core::InstanceHandle handle = is::run_instance(
         config_node, {ROS2__ROSIDL__BUILD_DIR});
@@ -330,7 +330,7 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
 
     const double tolerance = 1e-8;
 
-    YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__TEST_CONFIG);
+    YAML::Node config_node = YAML::LoadFile(ROS2__GEOMETRY_MSGS__SERVICES__TEST_CONFIG);
 
     is::core::InstanceHandle handle = is::run_instance(
         config_node, {ROS2__ROSIDL__BUILD_DIR});

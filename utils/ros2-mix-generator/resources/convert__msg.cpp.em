@@ -67,15 +67,20 @@ public:
             {
                 this->subscription_callback(*msg);
             },
-            qos_profile);
+            qos_profile,
+            nullptr, // CallbackGroup::SharedPtr default value
+            true); // subscription_options.ignore_local_publications
 #else
+        auto subscription_options = rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>>();
+        subscription_options.ignore_local_publications = true; // Enable ignore_local_publications option
         _subscription = node.create_subscription<Ros2_Msg>(
             topic_name,
             rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile)),
             [=](Ros2_Msg::UniquePtr msg)
             {
                 this->subscription_callback(*msg);
-            });
+            },
+            subscription_options);
 #endif // ifndef RCLCPP__QOS_HPP_
     }
 
@@ -86,7 +91,7 @@ private:
     {
         xtypes::DynamicData data(_message_type);
         convert_to_xtype(msg, data);
-        (*_callback)(data);
+        (*_callback)(data, nullptr);
     }
 
     // Save the callback that we were given by the is-ros2 plugin

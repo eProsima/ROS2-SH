@@ -106,6 +106,42 @@ bool SystemHandle::configure(
         name = name_node.as<std::string>("");
     }
 
+    auto create_node =
+            [&](const size_t domain_id = 0) -> void
+            {
+                /**
+                 * Since ROS2 Foxy, there is one participant per context.
+                 * Thus, to ensure isolation between nodes,
+                 * each node must be created in a different context.
+                 */
+
+                rclcpp::InitOptions init_options;
+                if (rcl_logging_rosout_enabled())
+                {
+                    init_options.auto_initialize_logging(false);
+                }
+
+                init_options.set_domain_id(domain_id);
+
+                const char* context_argv[1];
+                const std::string context_name("is_ros2_context_" + name);
+                context_argv[0] = context_name.c_str();
+
+                _context = std::make_shared<rclcpp::Context>();
+                _context->init(1, context_argv, init_options);
+
+                _executor_options.context = _context;
+
+                _node_options = std::make_shared<rclcpp::NodeOptions>();
+                _node_options->context(_context);
+
+                _node = std::make_shared<rclcpp::Node>(name, ns, *_node_options);
+
+                _logger << utils::Logger::Level::INFO
+                        << "Created node '" << ns << "/" << name << "' with Domain ID: "
+                        << init_options.get_domain_id() << std::endl;
+            };
+
     if (const YAML::Node domain_node = configuration["domain"])
     {
         if (!configuration["node_name"])
@@ -118,45 +154,11 @@ bool SystemHandle::configure(
         }
         // TODO(@jamoralp) Warn if not set a custom node name unique for each node.
 
-        /**
-         * Since ROS2 Foxy, there is one participant per context.
-         * Thus, to ensure isolation between nodes,
-         * each node must be created in a different context.
-         */
-
-        rclcpp::InitOptions init_options;
-        if (rcl_logging_rosout_enabled())
-        {
-            init_options.auto_initialize_logging(false);
-        }
-
-        init_options.set_domain_id(domain_node.as<size_t>());
-
-        const char* context_argv[1];
-        const std::string context_name("is_ros2_context_" + name);
-        context_argv[0] = context_name.c_str();
-
-        _context = std::make_shared<rclcpp::Context>();
-        _context->init(1, context_argv, init_options);
-
-        _executor_options.context = _context;
-
-        _node_options = std::make_shared<rclcpp::NodeOptions>();
-        _node_options->context(_context);
-
-        _node = std::make_shared<rclcpp::Node>(name, ns, *_node_options);
-
-        _logger << utils::Logger::Level::INFO
-                << "Created node '" << ns << "/" << name << "' with Domain ID: "
-                << init_options.get_domain_id() << std::endl;
+        create_node(domain_node.as<size_t>());
     }
     else
     {
-        // Using default DOMAIN_ID, the node can be added to the default context.
-        _logger << utils::Logger::Level::INFO
-                << "Created node '" << ns << "/" << name << "'" << std::endl;
-
-        _node = std::make_shared<rclcpp::Node>(name, ns);
+        create_node();
     }
 
     // TODO(MXG): Allow the type of executor to be specified by the configuration
@@ -322,6 +324,15 @@ bool SystemHandle::subscribe(
 
         return true;
     }
+}
+
+//==============================================================================
+bool SystemHandle::is_internal_message(
+        void* /*filter_handle*/)
+{
+    // Always return false, since this should be handled by the ROS 2 RMW and the fact that
+    // we created the ROS 2 subscriptions with the "ignore_local_publications" flag set to true.
+    return false;
 }
 
 //==============================================================================
