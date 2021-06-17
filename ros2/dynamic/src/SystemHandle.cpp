@@ -40,6 +40,8 @@ namespace is {
 namespace sh {
 namespace ros2 {
 
+namespace xtypes = eprosima::xtypes;
+
 /**
  * @class SystemHandle
  *        This class represents a full *Integration Service* system handle or plugin for the *ROS2*
@@ -72,7 +74,7 @@ public:
     bool configure(
             const core::RequiredTypes& /*types*/,
             const YAML::Node& configuration,
-            TypeRegistry& /*type_registry*/) override
+            TypeRegistry& type_registry) override
     {
         /*
          * The ROS 2 Dynamic SH doesn't define new types.
@@ -80,9 +82,20 @@ public:
          * already registered in the 'TypeRegistry' by the *Integration Service core*.
          */
 
-        if(configuration["namespace"])
+        if (configuration["namespace"])
         {
             namespace_ = configuration["namespace"].as<std::string>();
+        }
+
+        if (configuration["using"])
+        {
+            if (!add_types_to_registry(configuration["using"], type_registry))
+            {
+                logger_ << utils::Logger::Level::ERROR
+                        << "Failed to register the types." << std::endl;
+
+                return false;
+            }
         }
 
         try
@@ -194,6 +207,74 @@ public:
         }
     }
 
+    bool add_types_to_registry(
+        const YAML::Node& configuration,
+        TypeRegistry& type_registry)
+    {
+        logger_ << utils::Logger::Level::INFO << "Using node " << Dump(configuration) << std::endl;
+        std::map<std::pair<std::string, std::string>, std::string> type_paths; //<Package, Type>, Path
+
+        for (auto& conf : configuration)
+        {
+            std::string type = conf.as<std::string>();
+            logger_ << utils::Logger::Level::INFO << "TYPE: " << type << std::endl;
+            std::size_t found = type.find("/");
+            // The type introduced is a package. Register all the types inside that package
+            if (found == std::string::npos)
+            {
+                logger_ << utils::Logger::Level::INFO << "It is a package" << std::endl;
+                std::string path = "/opt/ros/" + ROS2_DISTRO + "/share/" + type + "/msg";
+
+                for (const auto & entry : std::filesystem::directory_iterator(path))
+                {
+                    if (std::filesystem::is_regular_file(entry) && entry.path().extension() == ".idl")
+                    {
+                        logger_ << utils::Logger::Level::INFO << "Entry in the path " << path
+                                << " : " << entry.path() << std::endl;
+                        type_paths.emplace(std::make_pair(type, entry.path().stem().string()), entry.path().string());
+                    }
+                }
+            }
+            else
+            {
+                logger_ << utils::Logger::Level::INFO << "It is a typename" << std::endl;
+                std::string pkg = type.substr(0, found);
+                std::string type_name = type.substr(found + 1);
+                std::string path = "/opt/ros/" + ROS2_DISTRO + "/share/" + pkg + "/msg/" + type_name + ".idl";
+                logger_ << utils::Logger::Level::INFO << "Package " << pkg << " Type " << type_name << std::endl;
+
+                if (std::filesystem::exists(path))
+                {
+                    type_paths.emplace(std::make_pair(pkg, type_name), path);
+                }
+                else
+                {
+                    logger_ << utils::Logger::Level::INFO << "The type '" << type_name << "' doesn't exists within the "
+                            << "package '" << pkg << "'" << std::endl;
+                }
+            }
+        }
+
+        for (auto const& [type, path] : type_paths)
+        {
+            xtypes::idl::Context context;
+            context.allow_keyword_identifiers = true;
+            context.include_paths.push_back("/opt/ros/" + ROS2_DISTRO + "/share");
+            xtypes::idl::parse_file(path, context);
+
+            if (context.success)
+            {
+                xtypes::DynamicType::Ptr dtype = context.module().submodule(type.first)->type(type.second, true);
+                if (dtype.get())
+                {
+                    type_registry.emplace(type.first + "::msg::" + type.second, std::move(dtype));
+                }
+            }
+        }
+
+        return true;
+    }
+
     void replace_all_string(
             std::string& str,
             const std::string& from,
@@ -212,6 +293,11 @@ public:
     bool preprocess_types(
         const YAML::Node& types_node) override
     {
+        if (!types_node)
+        {
+            return true;
+        }
+
         std::vector<std::string> include_paths;
         if (types_node["paths"])
         {
@@ -312,14 +398,14 @@ public:
                 logger_ << utils::Logger::Level::INFO
                         << "Parsing IDL" << std::endl;
 
-                eprosima::xtypes::idl::Context context;
+                xtypes::idl::Context context;
                 context.allow_keyword_identifiers = true;
                 if (!include_paths.empty())
                 {
                     context.include_paths = include_paths;
                 }
 
-                eprosima::xtypes::idl::parse(entry.as<std::string>(), context);
+                xtypes::idl::parse(entry.as<std::string>(), context);
 
                 if (context.success)
                 {

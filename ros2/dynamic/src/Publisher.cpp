@@ -34,7 +34,7 @@ Publisher::Publisher(
         Participant* participant,
         const std::string& topic_name,
         const xtypes::DynamicType& message_type,
-        const YAML::Node& config)
+        const YAML::Node& /*config*/)
     : participant_(participant)
     , topic_name_(topic_name)
     , logger_("is::sh::ROS2_Dynamic::Publisher")
