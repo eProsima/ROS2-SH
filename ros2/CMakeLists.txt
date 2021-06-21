@@ -56,16 +56,22 @@ if(BUILD_LIBRARY)
     configure_file(${PROJECT_SOURCE_DIR}/config.hpp.in
         ${CMAKE_INSTALL_PREFIX}/include/is/sh/ros2/config.hpp
     )
+endif()
 
-    # Build ROS2 Static SH or ROS2 Dynamic SH
-    set(IS_ROS2_SH_MODE_LOWERCASE "" CACHE STRING "Build mode to lowercase")
-    string(TOLOWER "${IS_ROS2_SH_MODE}" IS_ROS2_SH_MODE_LOWERCASE)
+# Build ROS2 Static SH or ROS2 Dynamic SH
+set(IS_ROS2_SH_MODE_LOWERCASE "" CACHE STRING "Build mode to lowercase")
+string(TOLOWER "${IS_ROS2_SH_MODE}" IS_ROS2_SH_MODE_LOWERCASE)
 
-    if("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "static")
-        add_subdirectory(static)
-    elseif("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "dynamic")
-        add_subdirectory(dynamic)
-    else()
-        message(WARNING "Invalid mode selected. Please choose between 'static' or 'dynamic'")
+if("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "static")
+    add_subdirectory(static)
+    if(BUILD_TESTS OR BUILD_ROS2_TESTS)
+        enable_testing()
     endif()
+elseif("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "dynamic")
+    add_subdirectory(dynamic)
+    if(BUILD_TESTS OR BUILD_ROS2_TESTS)
+        enable_testing()
+    endif()
+else()
+    message(WARNING "Invalid mode selected. Please choose between 'static' or 'dynamic'")
 endif()

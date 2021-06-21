@@ -23,11 +23,11 @@ cmake_minimum_required(VERSION 3.5.0)
 
 # Get Integration Service dependencies
 find_package(is-mock REQUIRED)
+find_package(rclcpp REQUIRED)
 
 # Get message dependencies
-# find_package(geometry_msgs REQUIRED)
-# find_package(nav_msgs REQUIRED)
-# find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 macro(compile_test)
     # Parse arguments
@@ -44,19 +44,17 @@ macro(compile_test)
     target_link_libraries(${TEST_NAME}
         PUBLIC
             is::mock
-            # ${rclcpp_LIBRARIES}
-            # ${geometry_msgs_LIBRARIES}
-            # ${nav_msgs_LIBRARIES}
-            # ${std_msgs_LIBRARIES}
+            ${rclcpp_LIBRARIES}
+            ${geometry_msgs_LIBRARIES}
+            ${std_msgs_LIBRARIES}
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
     	)
 
     target_include_directories(${TEST_NAME}
         PRIVATE
-            # ${geometry_msgs_INCLUDE_DIRS}
-            # ${nav_msgs_INCLUDE_DIRS}
-            # ${std_msgs_INCLUDE_DIRS}
+            ${geometry_msgs_INCLUDE_DIRS}
+            ${std_msgs_INCLUDE_DIRS}
         )
 
     target_compile_options(${TEST_NAME}
@@ -77,24 +75,23 @@ include(CTest)
 include(${IS_GTEST_CMAKE_MODULE_DIR}/gtest.cmake)
 enable_testing()
 
-# compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
-# compile_test(${PROJECT_NAME}_primitive_msgs SOURCE integration/ros2__primitives_msgs.cpp)
+compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
 compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp)
 
-#if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
-#    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
-#else()
-#    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
-#endif()
+if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
+    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
+else()
+    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
+endif()
 
 set(test_msgs_config_file "ros2__test_msgs.yaml")
 
 set_property(
-    # TARGET ${PROJECT_NAME}_geometry_msgs ${PROJECT_NAME}_test_domain ${PROJECT_NAME}_primitive_msgs
-    TARGET ${PROJECT_NAME}_check_ros2pkg_creation
+    TARGET
+        ${PROJECT_NAME}_check_ros2pkg_creation
+        ${PROJECT_NAME}_geometry_msgs
+        ${PROJECT_NAME}_test_domain
     APPEND PROPERTY COMPILE_DEFINITIONS PRIVATE
-        # "ROS2__GEOMETRY_MSGS__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs.yaml\""
-        # "ROS2__TEST_DOMAIN__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__domain_change.yaml\""
         "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
     )
 

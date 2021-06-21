@@ -211,46 +211,47 @@ public:
         const YAML::Node& configuration,
         TypeRegistry& type_registry)
     {
-        logger_ << utils::Logger::Level::INFO << "Using node " << Dump(configuration) << std::endl;
         std::map<std::pair<std::string, std::string>, std::string> type_paths; //<Package, Type>, Path
+
+        logger_ << utils::Logger::Level::INFO
+                << "Adding types to Type Registry for ROS 2 Dynamic SystemHandle" << std::endl;
 
         for (auto& conf : configuration)
         {
             std::string type = conf.as<std::string>();
-            logger_ << utils::Logger::Level::INFO << "TYPE: " << type << std::endl;
             std::size_t found = type.find("/");
             // The type introduced is a package. Register all the types inside that package
             if (found == std::string::npos)
             {
-                logger_ << utils::Logger::Level::INFO << "It is a package" << std::endl;
                 std::string path = "/opt/ros/" + ROS2_DISTRO + "/share/" + type + "/msg";
 
                 for (const auto & entry : std::filesystem::directory_iterator(path))
                 {
                     if (std::filesystem::is_regular_file(entry) && entry.path().extension() == ".idl")
                     {
-                        logger_ << utils::Logger::Level::INFO << "Entry in the path " << path
-                                << " : " << entry.path() << std::endl;
+                        logger_ << utils::Logger::Level::DEBUG << "The ROS 2 package '"
+                                << type << "' was added to the type registry." << std::endl;
                         type_paths.emplace(std::make_pair(type, entry.path().stem().string()), entry.path().string());
                     }
                 }
             }
             else
             {
-                logger_ << utils::Logger::Level::INFO << "It is a typename" << std::endl;
                 std::string pkg = type.substr(0, found);
                 std::string type_name = type.substr(found + 1);
                 std::string path = "/opt/ros/" + ROS2_DISTRO + "/share/" + pkg + "/msg/" + type_name + ".idl";
-                logger_ << utils::Logger::Level::INFO << "Package " << pkg << " Type " << type_name << std::endl;
 
                 if (std::filesystem::exists(path))
                 {
+                    logger_ << utils::Logger::Level::DEBUG << "The ROS 2 message '"
+                                << type << "' was added to the type registry." << std::endl;
                     type_paths.emplace(std::make_pair(pkg, type_name), path);
                 }
                 else
                 {
-                    logger_ << utils::Logger::Level::INFO << "The type '" << type_name << "' doesn't exists within the "
-                            << "package '" << pkg << "'" << std::endl;
+                    logger_ << utils::Logger::Level::WARN << "The type '" << type_name
+                            << "' doesn't exists within the package '" << pkg
+                            << "'. It will be ignored." << std::endl;
                 }
             }
         }
