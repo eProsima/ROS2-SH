@@ -77,9 +77,8 @@ public:
             TypeRegistry& type_registry) override
     {
         /*
-         * The ROS 2 Dynamic SH doesn't define new types.
-         * Needed types will be defined in the 'types' section of the YAML file, and hence,
-         * already registered in the 'TypeRegistry' by the *Integration Service core*.
+         * If any type different from the ROS 2 builtin ones want to be used, it need to
+         * be defined in the 'types' section of the YAML file.
          */
 
         if (configuration["namespace"])
