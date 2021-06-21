@@ -21,9 +21,11 @@
 #include <is/utils/Convert.hpp>
 #include <is/utils/Log.hpp>
 
+// #include <is/sh/ros2/config.hpp>
+
 // TODO: resolve this include #include <is/sh/ros2/config.hpp>
 // TODO remove this workaround
-#define ROS2_DISTRO "foxy"
+// #define ROS2_DISTRO "foxy"
 
 #include <yaml-cpp/yaml.h>
 #include <cxxabi.h>
@@ -38,6 +40,8 @@ namespace xtypes = eprosima::xtypes;
 using namespace std::chrono_literals;
 
 static is::utils::Logger logger("is::sh::ROS2_Dynamic::test::check_ros2pkg_creation");
+
+static const char* ros2_distro = std::getenv("ROS2_DISTRO");
 
 class ROS2Dynamic : public testing::Test
 {
@@ -62,7 +66,7 @@ public:
         yaml += "                };\n";
         yaml += "            };\n";
         yaml += "    paths: [\"/opt/ros/";
-        yaml += ROS2_DISTRO;
+        yaml += ros2_distro;
         yaml += "/share\"]\n";
         yaml += "systems:\n";
         yaml += "   ros2: { type: ros2_dynamic } \n";
@@ -103,7 +107,7 @@ public:
         logger << is::utils::Logger::Level::INFO << "Execute ROS2_Dynamic test" << std::endl;
 
         std::ostringstream command;
-        command << ". /opt/ros/" << ROS2_DISTRO << "/setup.sh && ros2 topic pub /test ";
+        command << ". /opt/ros/" << ros2_distro << "/setup.sh && ros2 topic pub /test ";
         command << "custom_msgs/msg/Message \"{text: {data: 'thisisatest'}}\" --once";
 
         FILE* pipe = popen(command.str().c_str(), "r");

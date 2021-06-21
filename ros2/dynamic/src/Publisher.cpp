@@ -191,13 +191,14 @@ const fastrtps::rtps::InstanceHandle_t Publisher::get_dds_instance_handle() cons
 }
 
 void Publisher::on_publication_matched(
-        ::fastdds::dds::DataWriter* /*writer*/,
+        ::fastdds::dds::DataWriter* writer,
         const ::fastdds::dds::PublicationMatchedStatus& info)
 {
     if (1 == info.current_count_change)
     {
         logger_ << utils::Logger::Level::INFO
-                << "Publisher for topic '" << topic_name_ << "' matched" << std::endl;
+                << "Publisher for topic '" << topic_name_ << "' matched in domain "
+                << writer->get_publisher()->get_participant()->get_domain_id() << std::endl;
     }
     else if (-1 == info.current_count_change)
     {

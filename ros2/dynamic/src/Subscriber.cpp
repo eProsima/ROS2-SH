@@ -256,13 +256,14 @@ void Subscriber::on_data_available(
 }
 
 void Subscriber::on_subscription_matched(
-        ::fastdds::dds::DataReader* /*reader*/,
+        ::fastdds::dds::DataReader* reader,
         const ::fastdds::dds::SubscriptionMatchedStatus& info)
 {
     if (1 == info.current_count_change)
     {
         logger_ << utils::Logger::Level::INFO
-                << "Subscriber for topic '" << topic_name_ << "' matched" << std::endl;
+                << "Subscriber for topic '" << topic_name_ << "' matched in domain "
+                << reader->get_subscriber()->get_participant()->get_domain_id() << std::endl;
     }
     else if (-1 == info.current_count_change)
     {
