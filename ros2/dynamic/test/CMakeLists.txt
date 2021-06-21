@@ -36,7 +36,7 @@ macro(compile_test)
     else()
         set(TEST_NAME "${ARGV0}")
     endif()
-    set(multiValueArgs SOURCE)
+    set(multiValueArgs SOURCE ENVIRONMENTS)
     cmake_parse_arguments(TEST "" "${uniValueArgs}" "${multiValueArgs}" ${ARGN})
 
     add_executable(${TEST_NAME} ${TEST_SOURCE})
@@ -50,6 +50,8 @@ macro(compile_test)
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
     	)
+
+    message(WARNING "INCLUDE PATH ${CMAKE_INSTALL_PREFIX}/include")
 
     target_include_directories(${TEST_NAME}
         PRIVATE
@@ -68,7 +70,7 @@ macro(compile_test)
             CXX_STANDARD 17
         )
 
-    add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE})
+    add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE} ENVIRONMENTS ${TEST_ENVIRONMENTS})
 endmacro()
 
 include(CTest)
@@ -76,7 +78,7 @@ include(${IS_GTEST_CMAKE_MODULE_DIR}/gtest.cmake)
 enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
-compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp)
+compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp ENVIRONMENTS "ROS2_DISTRO=${IS_ROS2_DISTRO}")
 
 if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)

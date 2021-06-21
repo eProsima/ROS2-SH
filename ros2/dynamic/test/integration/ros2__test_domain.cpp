@@ -70,7 +70,6 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
 
     auto node_1 = std::make_shared<rclcpp::Node>("node_1", node_ops_1);
 
-
     rclcpp::InitOptions init_options_2;
     if (rcl_logging_rosout_enabled())
     {
@@ -112,6 +111,8 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
     auto node2_sub = [&](std_msgs::msg::String::UniquePtr msg)
             {
                 std::unique_lock<std::mutex> lock(node2_sub_mutex);
+                logger << is::utils::Logger::Level::DEBUG
+                       << "Setting value to promise" << std::endl;
                 msg_promise.set_value(*msg);
             };
 
@@ -129,14 +130,14 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
     rclcpp::executors::SingleThreadedExecutor executor;
     using namespace std::chrono_literals;
 
-    auto rclcpp_delay = 500ms;
+    auto rclcpp_delay = 1s;
     publisher->publish(pub_msg);
     executor.spin_node_some(node_1);
     std::this_thread::sleep_for(rclcpp_delay);
     executor.spin_node_some(node_2);
 
     // In different domains the message should not be received
-    ASSERT_NE(msg_future.wait_for(0s), std::future_status::ready);
+    ASSERT_NE(msg_future.wait_for(1s), std::future_status::ready);
 
     std::string yaml;
 
@@ -158,11 +159,19 @@ TEST(ROS2, Change_ROS2_Domain_id__ROS2_Galactic_or_older)
     ASSERT_TRUE(handle);
 
     // Wait for the Integration Service to start properly before publishing.
-    std::this_thread::sleep_for(1s);
-    publisher->publish(pub_msg);
-    executor.spin_node_some(node_1);
-    std::this_thread::sleep_for(rclcpp_delay);
-    executor.spin_node_some(node_2);
+    auto start_time = std::chrono::steady_clock::now();
+    while (std::chrono::steady_clock::now() - start_time < 30s)
+    {
+        executor.spin_node_some(node_1);
+        std::this_thread::sleep_for(rclcpp_delay);
+        executor.spin_node_some(node_2);
+        if (msg_future.wait_for(100ms) == std::future_status::ready)
+        {
+            break;
+        }
+
+        publisher->publish(pub_msg);
+    }
 
     ASSERT_EQ(msg_future.wait_for(0s), std::future_status::ready);
 
