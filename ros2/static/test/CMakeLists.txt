@@ -23,6 +23,7 @@ cmake_minimum_required(VERSION 3.5.0)
 
 # Get Integration Service dependencies
 find_package(is-mock REQUIRED)
+find_package(rclcpp REQUIRED)
 
 # Get message dependencies
 find_package(geometry_msgs REQUIRED)
