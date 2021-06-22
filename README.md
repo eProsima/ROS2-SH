@@ -23,21 +23,37 @@ implementation for the *xTypes* protocol, that is, [eProsima xTypes](https://git
 
 <a href="https://docs.ros.org/en/foxy/"><img src="docs/images/ros2_logo.png" align="left" hspace="8" vspace="0" width="90"></a>
 
-This repository contains the source code of *Integration Service* **System Handle**
+This repository contains the source code of *Integration Service* **System Handles**
 for the [ROS 2](https://docs.ros.org/en/foxy) middleware protocol, widely used in the robotics field.
+Two implementations can be distinguished: **static** one based on *ROS 2* `rclcpp` and **dynamic** one based on *Fast DDS* (by the moment it is only available for the Publisher-Subscriber paradigm).
 
-This *System Handle* can be used for two main purposes:
+This *System Handles* can be used for two main purposes:
 
 1. Connection between a *ROS 2* application and an application running over a different middleware implementation.
   This is the classic use-case approach for *Integration Service*.
 
 1. Connecting two *ROS 2* applications running under different Domain IDs.
 
+The main advantages of the *Dynamic ROS 2 System Handle* over the *Static ROS 2 System Handle* are the following ones:
+
+1. It allows using types defined by *IDL* without previously generating and installing the ROS 2 Type
+  Support for that type, which gives it a greater versatility with respect to the *Static ROS 2 System
+  Handle*.
+
+1. It is not necessary to decide which ROS 2 builtin types you are going to use during the compilation
+  phase, as it allows you to use any of them.
+
 ## Dependencies
 
-This section provides a list of the dependencies needed in order to compile *ROS 2 System Handle*.
+This section provides a list of the dependencies needed in order to compile *ROS 2 System Handles*.
+
+**Static ROS 2 System Handle**
 
 * [ROS 2](https://docs.ros.org/en/foxy/Installation.html): *Foxy/Galactic ROS 2* distribution.
+
+**Dynamic ROS 2 System Handle**
+
+* [Fast DDS](https://github.com/eProsima/Fast-DDS#installation-guide): eProsima C++ implementation for DDS.
 
 ## Configuration
 
@@ -51,7 +67,7 @@ To get a more precise idea on how these YAML files have to be filled and which f
 in order to succesfully configure and launch an *Integration Service* project, please refer to the
 [dedicated configuration section](https://integration-service.docs.eprosima.com/en/latest/user_manual/yaml_config.html) of the official documentation.
 
-Regarding the *ROS 2 System Handle*, there are several specific parameters which can be configured
+Regarding the *ROS 2 System Handles*, there are several specific parameters which can be configured
 for the ROS 2 middleware. All of these parameters are optional, and fall as suboptions of the main
 five sections described in the *Configuration* chapter of the *Integration Service* repository:
 
@@ -118,18 +134,31 @@ five sections described in the *Configuration* chapter of the *Integration Servi
     * `reliability`: This QoS indicates the level of reliability offered and requested by the service.
       There are two possible values: `RELIABLE` and `BEST_EFFORT`.
 
+  The *Dynamic ROS 2 System Handle* has an additional parameter:
+
+  ```yaml
+    systems:
+      ros2:
+        type: ros2_dynamic
+        namespace: "/"
+        node_name: "my_ros2_node"
+        domain: 4
+        using: [std_msgs/String, geometry_msgs]
+    ```
+  * `using`: List of the *ROS 2* builtin types or packages that want to be used in the communication.
+
 ## Examples
 
-There are several *Integration Service* examples using the *ROS 2 System Handle* available
+There are several *Integration Service* examples using the *Static ROS 2 System Handle* available
 in the project's [main source code repository]([https://](https://github.com/eProsima/Integration-Service/tree/main/examples)).
 
-Some of these examples, where the *ROS 2 System Handle* plays a different role in each of them, are introduced here.
+Some of these examples, where the *Static ROS 2 System Handle* plays a different role in each of them, are introduced here.
 
 <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/ros1-ros2.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 - ROS 1 bridge  (publisher - subscriber)
 
-In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *ROS 1 System Handle*
+In this example, *Integration Service* uses both this *Static ROS 2 System Handle* and the *ROS 1 System Handle*
 to transmit data coming from a ROS 2 publisher into the ROS 1 data space, so that it can be
 consumed by a ROS 1 subscriber on the same topic, and viceversa.
 
@@ -147,7 +176,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 ### ROS 2 - DDS bridge  (publisher - subscriber)
 
-In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *Fast DDS System Handle*
+In this example, *Integration Service* uses both this *Static ROS 2 System Handle* and the *Fast DDS System Handle*
 to transmit data coming from a ROS 2 publisher into the DDS data space, so that it can be
 consumed by a Fast DDS subscriber on the same topic, and viceversa.
 
@@ -165,7 +194,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 ### ROS 2 - WebSocket bridge  (publisher - subscriber)
 
-In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *WebSocket System Handle*
+In this example, *Integration Service* uses both this *Static ROS 2 System Handle* and the *WebSocket System Handle*
 to transmit data coming from a ROS 2 publisher to a WebSocket Client, and viceversa.
 
 <p align="center">
@@ -182,7 +211,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 ### ROS 2 - FIWARE bridge  (publisher - subscriber)
 
-In this example, *Integration Service* uses both this *ROS 2 System Handle* and the *FIWARE System Handle*
+In this example, *Integration Service* uses both this *Static ROS 2 System Handle* and the *FIWARE System Handle*
 to transmit data coming from a ROS 2 publisher and update them in a FIWARE Context Broker MongoDB database, and viceversa.
 
 <p align="center">
@@ -200,7 +229,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 ### ROS 2 service server
 
-In this example, the *ROS 2 System Handle* tackles the task of bridging a ROS 2 server with one or more client applications,
+In this example, the *Static ROS 2 System Handle* tackles the task of bridging a ROS 2 server with one or more client applications,
 playing the role of a service server capable of processing incoming requests from several middlewares (*DDS*, *ROS1*,
 *WebSocket*) and producing an appropriate answer for them.
 
@@ -254,7 +283,7 @@ For a detailed step by step guide on how to build and test this example, please 
 
 Besides the [global compilation flags](https://integration-service.docs.eprosima.com/en/latest/installation_manual/installation.html#global-compilation-flags) available for the
 whole *Integration Service* product suite, there are some specific flags which apply only to the
-*ROS 2 System Handle*; they are listed below:
+*ROS 2 System Handles*; they are listed below:
 
 * `BUILD_ROS2_TESTS`: Allows to specifically compile the *ROS 2 System Handle* unitary and
   integration tests; this is useful to avoid compiling each *System Handle's* test suite present
@@ -268,6 +297,10 @@ whole *Integration Service* product suite, there are some specific flags which a
 * `IS_ROS2_DISTRO`: This flag is intended to select the *ROS 2* distro that should be used to compile the *ROS 2 System Handle*.
   If not set, the version will be retrieved from the last *ROS distro* sourced in the compilation environment;
   this means that if the last *ROS* environment sourced corresponds to *ROS 1*, the compilation process will stop and warn the user about it.
+
+* `IS_ROS2_SH_MODE`: This flag is to decide which *ROS 2 System Handle* mode will be compiled, as the static and dynamic modes are exclusive which means that they cannot be compiled at the same time. It accepts two different values: `static` or `dynamic`.
+
+The following flags are only applicable for the *Static ROS 2 System Handle*:
 
 * `MIX_ROS_PACKAGES`: It accepts as an argument a list of [ROS packages](https://index.ros.org/packages/),
   such as `std_msgs`, `geometry_msgs`, `sensor_msgs`, `nav_msgs`... for which the required transformation
@@ -303,7 +336,7 @@ whole *Integration Service* product suite, there are some specific flags which a
 
 ## Documentation
 
-The official documentation for the *ROS 2 System Handle* is included within the official *Integration Service*
+The official documentation for the *ROS 2 System Handles* is included within the official *Integration Service*
 documentation, hosted by [Read the Docs](https://integration-service.docs.eprosima.com/), and comprises the following sections:
 
 * [Installation Manual](https://integration-service.docs.eprosima.com/en/latest/installation_manual/installation_manual.html)
