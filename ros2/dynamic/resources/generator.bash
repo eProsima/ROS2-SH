@@ -5,30 +5,40 @@ install_path=""
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -p|--package_name) package_name="$2"; shift ;;
-        -d|--dependencies) dependencies="$2"; shift ;;
         -i|--install_path) install_path="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1" ;;
+        *)
+          if [[ $1 == *"--"* ]]; then
+                param="${1/--/}"
+                declare $param="$2"
+                echo $1 $2
+          fi ;;
     esac
     shift
 done
 
-echo "Generating Type Support for package $package_name with dependencies $dependencies";
+for pkg in $package_name; do
 
-cp /tmp/CMakeLists.txt /tmp/$package_name/
+  echo "Generating Type Support for package $pkg with dependencies ${!pkg}";
 
-sed "s#<name>\([^<][^<]*\)</name>#<name>$package_name</name>#" /tmp/package.xml > /tmp/$package_name/package.xml
+  cp /tmp/CMakeLists.txt /tmp/$pkg/
 
-cd /tmp/$package_name
+  sed "s#<name>\([^<][^<]*\)</name>#<name>$pkg</name>#" /tmp/package.xml > /tmp/$pkg/package.xml
 
-echo "Installing the generated Type Support in $install_path";
+  cd /tmp/$pkg
 
-cmake . -DIS_PACKAGE_NAME=$package_name -DPACKAGE_DEPENDENCIES=$dependencies -DCMAKE_INSTALL_PREFIX:PATH=$install_path
+  echo "Installing the generated Type Support in $install_path";
 
-cmake --build . --target install
+  echo "Command: cmake . -DIS_PACKAGE_NAME=$pkg -DPACKAGE_DEPENDENCIES=${!pkg} -DCMAKE_INSTALL_PREFIX:PATH=$install_path";
 
-if [ $? -ne 0 ]
-then
-  exit 1
-fi
+  cmake . -DIS_PACKAGE_NAME=$pkg -DPACKAGE_DEPENDENCIES=${!pkg} -DCMAKE_INSTALL_PREFIX:PATH=$install_path
+
+  cmake --build . --target install
+
+  if [ $? -ne 0 ]
+  then
+    exit 1
+  fi
+
+done
 
 . $install_path/setup.bash

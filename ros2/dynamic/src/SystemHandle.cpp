@@ -325,9 +325,13 @@ public:
                 std::vector<std::string> custom_include_paths;
                 bool custom_includes = false;
                 // Retrieve the include clauses from the IDL
-                std::regex incl_reg("#\\s*include\\s+[<\"][^>\"]*[>\"]");
+                std::regex incl_reg("#\\s*include\\s*[<\"][^>\"]*[>\"]");
                 std::string idl = entry.as<std::string>();
                 replace_all_string(idl, "#include", "\n#include");
+
+                logger_ << utils::Logger::Level::DEBUG
+                                << "IDL string" << idl << std::endl;
+
                 std::sregex_iterator iter(idl.begin(), idl.end(), incl_reg);
                 std::sregex_iterator end;
 
@@ -413,19 +417,11 @@ public:
                     logger_ << utils::Logger::Level::DEBUG
                             << "Number of modules: " << modules << std::endl;
 
-                    if (modules == 0)
+                    if (modules < 1)
                     {
                         logger_ << utils::Logger::Level::ERROR
                                 << "The type is not declared within an IDL module. Please follow the ROS 2 naming convention."
                                 << std::endl;
-
-                        return false;
-                    }
-                    else if (modules > 1)
-                    {
-                        logger_ << utils::Logger::Level::ERROR
-                                << "There can only be one module per IDL, add"
-                                << " another entry in the YAML `idls` tag." << std::endl;
 
                         return false;
                     }
@@ -468,43 +464,33 @@ public:
 
                                 package_names.insert(mod.name());
 
-                                std::string aux;
-                                std::size_t found = idl.rfind("struct");
-                                aux = idl.substr(found + 7);
-                                found = aux.find("{");
-                                aux = aux.substr(0, found);
-                                aux.erase(remove_if(aux.begin(), aux.end(), isspace), aux.end());
+                                auto all_types = context.module().submodule(mod.name()).get()->get_all_types();
 
-                                // Get the type corresponding to the last struct inside the current module
-                                auto type = context.module().submodule(mod.name()).get()->type(aux, true);
-
-                                // Check if it is a Structure
-                                if (type.get()->kind() != xtypes::TypeKind::STRUCTURE_TYPE)
+                                for (auto [name, dtype] : all_types)
                                 {
-                                    logger_ << utils::Logger::Level::ERROR
-                                        << "[" << aux
-                                        << "] is not a structure."
-                                        << std::endl;
-                                    is_success = false;
-                                    return;
-                                }
+                                    // Check if it is a Structure
+                                    if (dtype.get()->kind() != xtypes::TypeKind::STRUCTURE_TYPE)
+                                    {
+                                        logger_ << utils::Logger::Level::ERROR
+                                            << "[" << name
+                                            << "] is not a structure."
+                                            << std::endl;
+                                        is_success = false;
+                                        return;
+                                    }
 
-                                // Check that the message name follows the ROS2 naming convention
-                                std::regex type_reg("[A-Z]([a-zA-Z0-9])+");
-                                if (!std::regex_match(aux, type_reg))
-                                {
-                                    logger_ << utils::Logger::Level::ERROR
-                                        << "The message name [" << aux
-                                        << "] doesn't follow the ROS2 naming convention."
-                                        << std::endl;
-                                    is_success = false;
-                                    return;
-                                }
-
-                                //TODO: Change when the services are implemented
-                                std::ofstream idlfile ("/tmp/" + mod.name() + "/msg/" + aux + ".idl");
-                                idlfile << idl << std::endl;
-                                idlfile.close();
+                                    // Check that the message name follows the ROS2 naming convention
+                                    std::regex type_reg("[A-Z]([a-zA-Z0-9])*");
+                                    if (!std::regex_match(name, type_reg))
+                                    {
+                                        logger_ << utils::Logger::Level::ERROR
+                                            << "The message name [" << name
+                                            << "] doesn't follow the ROS2 naming convention."
+                                            << std::endl;
+                                        is_success = false;
+                                        return;
+                                    }
+                                };
 
                                 for (const auto& mv_idl : custom_include_paths)
                                 {
@@ -519,78 +505,148 @@ public:
                                     }
                                 }
 
-                                const std::string package_name = "--package_name " + mod.name();
-                                const std::string path = "--install_path /opt/ros/" + ROS2_DISTRO;
+                            }, false);
 
-                                logger_ << is::utils::Logger::Level::INFO
-                                        << "Generating ROS2 Type Support for package: " << package_name
-                                        << std::endl;
+                            std::map<std::string, std::string> resulting_idl;
+                            auto m_idl = eprosima::xtypes::idl::generate(
+                                static_cast<const xtypes::idl::Module&>
+                                (context.module()), &resulting_idl);
 
-                                std::string command = "exec bash /tmp/generator.bash " + package_name + " " + path;
 
-                                if (ros2_modules.size() != 0)
+                            std::string depends = "";
+
+                            // The Xtypes generator generates code also for the ROS2 types, which is not neccessary
+                            std::set<std::string> remove;
+                            if (!ros2_modules.empty())
+                            {
+                                for (auto& pair : resulting_idl)
                                 {
-                                    std::ostringstream stream;
-                                    std::copy(ros2_modules.begin(), ros2_modules.end(), std::ostream_iterator<std::string>(stream, ";"));
-                                    const std::string depends = "--dependencies \"" + stream.str() + "\"";
-
-                                    logger_ << is::utils::Logger::Level::DEBUG
-                                        << "ROS2 Type Support Dependencies [" << depends
-                                        << "]" << std::endl;
-
-                                    command += " " + depends;
-                                }
-
-                                FILE* pipe = popen(command.c_str(), "r");
-                                if (!pipe)
-                                {
-                                    logger_ << utils::Logger::Level::ERROR
-                                            << " Failed to execute command: " << command
-                                            << std::endl;
-                                    is_success = false;
-                                    return;
-                                }
-
-                                char buffer[128];
-                                std::string output = "";
-                                while(!feof(pipe)) {
-                                    if(fgets(buffer, 128, pipe) != NULL)
-                                        output += buffer;
-                                }
-
-                                logger_ << is::utils::Logger::Level::DEBUG
-                                        << output << std::endl;
-
-                                int st = pclose(pipe);
-                                if (WIFEXITED(st))
-                                {
-                                    if (1 == WEXITSTATUS(st))
+                                    if (ros2_modules.find(pair.first.substr(0, pair.first.find("::"))) != ros2_modules.end())
                                     {
-                                        logger_ << is::utils::Logger::Level::ERROR
-                                                << "Failed to generate the Type Support for package '" << package_name
-                                                << "'. Make sure you follow all the ROS2 naming and structure convention"
-                                                << " rules" << std::endl;
+                                        remove.insert(pair.second);
+                                    }
+                                }
+                            }
 
-                                        if (logger_.get_level() != is::utils::Logger::Level::DEBUG)
+                            // Transform the dependencies into include clauses
+                            for (auto& pair : resulting_idl)
+                            {
+                                if (pair.first.find(":dependencies") == std::string::npos
+                                    && remove.find(pair.second) == remove.end())
+                                {
+                                    std::set<std::string> dependencies;
+                                    logger_ << utils::Logger::Level::DEBUG
+                                            << "[" << pair.first << "]";
+
+                                    for (auto& r_str : remove)
+                                    {
+                                        auto pos = pair.second.find(r_str);
+                                        if (pos != std::string::npos)
                                         {
-                                            logger_ << is::utils::Logger::Level::ERROR
-                                                    << output << std::endl;
+                                            pair.second.erase(pos, r_str.length());
                                         }
 
-                                        is_success = false;
-                                        return;
-                                    }
-                                    else if (0 == WEXITSTATUS(st))
-                                    {
-                                        logger_ << is::utils::Logger::Level::INFO
-                                                << "ROS2 Type Supports generation finished for package '"
-                                                << package_name << "', installedin path "
-                                                << path << std::endl;
                                     }
 
+                                    auto it = resulting_idl.find(pair.first + ":dependencies");
+                                    if (it != resulting_idl.end())
+                                    {
+                                        std::stringstream ss(resulting_idl[pair.first + ":dependencies"]);
+                                        std::string str;
+                                        std::string includes;
+                                        while (getline(ss, str, ',')) {
+                                            std::string package = str.substr(0, str.find("::"));
+                                            // If the dependency corresponds with the same package as the current idl
+                                            // don't insert it. It will generate a circular dependency.
+                                            if (pair.first.find(package) == std::string::npos)
+                                            {
+                                                dependencies.insert(package);
+                                            }
+                                            includes += "#include <" + str + ".idl>\n";
+                                        }
+                                        replace_all_string(includes, "::", "/");
+                                        resulting_idl.erase(it);
+                                        resulting_idl[pair.first] = includes + "\n" + pair.second;
+                                    }
+
+                                    logger_ << pair.second << std::endl;
+
+                                    std::string struct_path = pair.first;
+                                    replace_all_string(struct_path, "::", "/");
+                                    std::ofstream idlfile ("/tmp/" + struct_path + ".idl");
+                                    idlfile << pair.second << std::endl;
+                                    idlfile.close();
+
+                                    if (!dependencies.empty())
+                                    {
+                                        std::ostringstream dep_stream;
+                                        std::copy(dependencies.begin(), dependencies.end(), std::ostream_iterator<std::string>(dep_stream, ";"));
+                                        depends += "--" + pair.first.substr(0, pair.first.find("::")) + " \"" + dep_stream.str() + "\" ";
+                                    }
+                                }
+                            }
+
+                            // Call the bash that generates the ROS 2 type support for the idl types
+                            std::ostringstream pkg_stream;
+                            std::copy(package_names.begin(), package_names.end(), std::ostream_iterator<std::string>(pkg_stream, " "));
+                            const std::string package_name = "--package_name \"" + pkg_stream.str() + "\" ";
+                            const std::string path = "--install_path /opt/ros/" + ROS2_DISTRO;
+
+                            logger_ << is::utils::Logger::Level::INFO
+                                    << "Generating ROS2 Type Support for package: " << package_name
+                                    << std::endl;
+
+                            std::string command = "exec bash /tmp/generator.bash " + package_name + " " + path + " " + depends;
+
+                            logger_ << utils::Logger::Level::DEBUG
+                                    << "Command: " << command << std::endl;
+
+                            FILE* pipe = popen(command.c_str(), "r");
+                            if (!pipe)
+                            {
+                                logger_ << utils::Logger::Level::ERROR
+                                        << " Failed to execute command: " << command
+                                        << std::endl;
+                                return false;
+                            }
+
+                            char buffer[128];
+                            std::string output = "";
+                            while(!feof(pipe)) {
+                                if(fgets(buffer, 128, pipe) != NULL)
+                                    output += buffer;
+                            }
+
+                            logger_ << is::utils::Logger::Level::DEBUG
+                                    << output << std::endl;
+
+                            int st = pclose(pipe);
+                            if (WIFEXITED(st))
+                            {
+                                if (1 == WEXITSTATUS(st))
+                                {
+                                    logger_ << is::utils::Logger::Level::ERROR
+                                            << "Failed to generate the Type Support for package '" << package_name
+                                            << "'. Make sure you follow all the ROS2 naming and structure convention"
+                                            << " rules" << std::endl;
+
+                                    if (logger_.get_level() != is::utils::Logger::Level::DEBUG)
+                                    {
+                                        logger_ << is::utils::Logger::Level::ERROR
+                                                << output << std::endl;
+                                    }
+
+                                    return false;
+                                }
+                                else if (0 == WEXITSTATUS(st))
+                                {
+                                    logger_ << is::utils::Logger::Level::INFO
+                                            << "ROS2 Type Supports generation finished for package '"
+                                            << package_name << "', installedin path "
+                                            << path << std::endl;
                                 }
 
-                            }, false);
+                            }
 
                         return is_success;
                     }
