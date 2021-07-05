@@ -142,6 +142,10 @@ private:
             ::fastdds::dds::DataWriter* /*writer*/,
             const ::fastdds::dds::PublicationMatchedStatus& info) override;
 
+    void get_qos_from_config(
+            ::fastdds::dds::DataWriterQos* dw_qos,
+             const YAML::Node& config);
+
     /**
      * Class members.
      */

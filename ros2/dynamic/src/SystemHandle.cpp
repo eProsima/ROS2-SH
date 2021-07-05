@@ -128,13 +128,13 @@ public:
             const std::string& topic_name,
             const xtypes::DynamicType& message_type,
             SubscriptionCallback* callback,
-            const YAML::Node& /* configuration */) override
+            const YAML::Node& configuration) override
     {
         try
         {
             std::string topic_name_mangling = get_ros2_topic_name(topic_name);
             auto subscriber = std::make_shared<Subscriber>(
-                participant_.get(), topic_name_mangling, message_type, callback);
+                participant_.get(), topic_name_mangling, message_type, callback, configuration);
 
             subscribers_.emplace_back(std::move(subscriber));
 

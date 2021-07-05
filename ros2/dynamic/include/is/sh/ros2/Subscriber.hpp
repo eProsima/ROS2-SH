@@ -80,7 +80,8 @@ public:
             Participant* participant,
             const std::string& topic_name,
             const xtypes::DynamicType& message_type,
-            TopicSubscriberSystem::SubscriptionCallback* is_callback);
+            TopicSubscriberSystem::SubscriptionCallback* is_callback,
+            const YAML::Node& config);
 
     // TODO(@jamoralp): Create subscriber based on XML profiles?
 
@@ -144,6 +145,11 @@ private:
      *        reception threads database.
      */
     void cleaner_function();
+
+
+    void get_qos_from_config(
+            ::fastdds::dds::DataReaderQos* dw_qos,
+             const YAML::Node& config);
 
     /**
      * Class members.

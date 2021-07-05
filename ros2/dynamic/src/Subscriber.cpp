@@ -31,6 +31,8 @@
 #include <functional>
 #include <iostream>
 
+#define NS_TO_S(nanoseconds) (nanoseconds / (1000 * 1000 * 1000))
+
 namespace eprosima {
 namespace is {
 namespace sh {
@@ -40,7 +42,8 @@ Subscriber::Subscriber(
         Participant* participant,
         const std::string& topic_name,
         const xtypes::DynamicType& message_type,
-        TopicSubscriberSystem::SubscriptionCallback* is_callback)
+        TopicSubscriberSystem::SubscriptionCallback* is_callback,
+        const YAML::Node& config)
     : participant_(participant)
     , dds_subscriber_(nullptr)
     , dynamic_data_(nullptr)
@@ -136,6 +139,12 @@ Subscriber::Subscriber(
     ::fastdds::dds::ReliabilityQosPolicy rel_policy;
     rel_policy.kind = ::fastdds::dds::RELIABLE_RELIABILITY_QOS;
     datareader_qos.reliability(rel_policy);
+
+    // Configure datareader QoS according to config node
+    if (config["qos"])
+    {
+        get_qos_from_config(&datareader_qos, config["qos"]);
+    }
 
     dds_datareader_ = dds_subscriber_->create_datareader(dds_topic_, datareader_qos, this);
     if (dds_datareader_)
@@ -326,6 +335,172 @@ void Subscriber::cleaner_function()
             thread->join();
         }
         delete thread;
+    }
+}
+
+void Subscriber::get_qos_from_config(
+    ::fastdds::dds::DataReaderQos* dr_qos,
+    const YAML::Node& config)
+{
+    logger_ << utils::Logger::Level::DEBUG
+                    << "Subscriber created wit QoS: " << YAML::Dump(config) << std::endl;
+
+    // Configure datawriter QoS according to config node
+    if (config["history"])
+    {
+        ::fastdds::dds::HistoryQosPolicy hist_policy;
+        if (config["history"]["kind"])
+        {
+            std::string hist_kind = config["history"]["kind"].as<std::string>();
+            if (hist_kind == "KEEP_LAST")
+            {
+                hist_policy.kind = ::fastdds::dds::KEEP_LAST_HISTORY_QOS;
+            }
+            else if (hist_kind == "KEEP_ALL")
+            {
+                hist_policy.kind = ::fastdds::dds::KEEP_ALL_HISTORY_QOS;
+            }
+            else
+            {
+                logger_ << utils::Logger::Level::WARN
+                        << "History QoS kind is unknown. "
+                        << "The valid values are: KEEP_LAST and KEEP_ALL." << std::endl;
+            }
+        }
+
+        if (config["history"]["depth"])
+        {
+            hist_policy.depth = config["history"]["depth"].as<int>();
+        }
+
+        dr_qos->history(hist_policy);
+    }
+
+    if (config["reliability"])
+    {
+        ::fastdds::dds::ReliabilityQosPolicy rel_policy;
+        std::string rel_kind = config["reliability"].as<std::string>();
+        if (rel_kind == "RELIABLE")
+        {
+            rel_policy.kind = ::fastdds::dds::RELIABLE_RELIABILITY_QOS;
+        }
+        else if (rel_kind == "BEST_EFFORT")
+        {
+            rel_policy.kind = ::fastdds::dds::BEST_EFFORT_RELIABILITY_QOS;
+        }
+        else
+        {
+            logger_ << utils::Logger::Level::WARN
+                    << "Reliability QoS kind is unknown. "
+                    << "The valid values are: RELIABLE and BEST_EFFORT." << std::endl;
+        }
+
+        dr_qos->reliability(rel_policy);
+    }
+
+    if (config["durability"])
+    {
+        ::fastdds::dds::DurabilityQosPolicy dur_policy;
+        std::string dur_kind = config["durability"].as<std::string>();
+        if (dur_kind == "VOLATILE")
+        {
+            dur_policy.kind = ::fastdds::dds::VOLATILE_DURABILITY_QOS;
+        }
+        else if (dur_kind == "TRANSIENT_LOCAL")
+        {
+            dur_policy.kind = ::fastdds::dds::TRANSIENT_LOCAL_DURABILITY_QOS;
+        }
+        else
+        {
+            logger_ << utils::Logger::Level::WARN
+                    << "Durability QoS kind is unknown. "
+                    << "The valid values are: VOLATILE and TRANSIENT_LOCAL." << std::endl;
+        }
+
+        dr_qos->durability(dur_policy);
+    }
+
+    if (config["deadline"])
+    {
+        ::fastdds::dds::DeadlineQosPolicy d_policy;
+        eprosima::fastrtps::rtps::Time_t d_period = eprosima::fastrtps::c_TimeInfinite;
+        if (config["deadline"]["sec"])
+        {
+            d_period.seconds(config["deadline"]["sec"].as<int32_t>());
+        }
+
+        if (config["deadline"]["nanosec"])
+        {
+            d_period.nanosec(config["deadline"]["sec"].as<uint32_t>());
+        }
+
+        d_policy.period = d_period.to_duration_t();
+        dr_qos->deadline(d_policy);
+    }
+
+    if (config["lifespan"])
+    {
+        ::fastdds::dds::LifespanQosPolicy life_policy;
+        eprosima::fastrtps::rtps::Time_t life_duration = eprosima::fastrtps::c_TimeInfinite;
+        if (config["lifespan"]["sec"])
+        {
+            life_duration.seconds(config["lifespan"]["sec"].as<int32_t>());
+        }
+
+        if (config["lifespan"]["nanosec"])
+        {
+            life_duration.nanosec(config["lifespan"]["sec"].as<uint32_t>());
+        }
+
+        life_policy.duration = life_duration.to_duration_t();
+        dr_qos->lifespan(life_policy);
+    }
+
+    if (config["liveliness"])
+    {
+        ::fastdds::dds::LivelinessQosPolicy live_policy;
+        if (config["liveliness"]["kind"])
+        {
+            std::string live_kind = config["liveliness"]["kind"].as<std::string>();
+            if (live_kind == "AUTOMATIC")
+            {
+                live_policy.kind = ::fastdds::dds::AUTOMATIC_LIVELINESS_QOS;
+            }
+            else if (live_kind == "MANUAL_BY_TOPIC")
+            {
+                live_policy.kind = ::fastdds::dds::MANUAL_BY_TOPIC_LIVELINESS_QOS;
+            }
+            else
+            {
+                logger_ << utils::Logger::Level::WARN
+                        << "Liveliness QoS kind is unknown. "
+                        << "The valid values are: AUTOMATIC and MANUAL_BY_TOPIC." << std::endl;
+            }
+        }
+
+        eprosima::fastrtps::rtps::Time_t live_duration = eprosima::fastrtps::c_TimeInfinite;
+        bool lease_duration_changed = false;
+        if (config["liveliness"]["sec"])
+        {
+            live_duration.seconds(config["liveliness"]["sec"].as<int32_t>());
+            lease_duration_changed = true;
+        }
+
+        if (config["liveliness"]["nanosec"])
+        {
+            live_duration.nanosec(config["liveliness"]["sec"].as<uint32_t>());
+            lease_duration_changed = true;
+        }
+
+        if (lease_duration_changed)
+        {
+            double ns = live_duration.to_ns() * 2.0 / 3.0;
+            double s = NS_TO_S(ns);
+            live_policy.announcement_period = eprosima::fastrtps::Duration_t(s);
+        }
+        live_policy.lease_duration = live_duration.to_duration_t();
+
+        dr_qos->liveliness(live_policy);
     }
 }
 
