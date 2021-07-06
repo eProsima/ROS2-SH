@@ -308,7 +308,7 @@ void Publisher::get_qos_from_config(
 
         if (config["deadline"]["nanosec"])
         {
-            d_period.nanosec(config["deadline"]["sec"].as<uint32_t>());
+            d_period.nanosec(config["deadline"]["nanosec"].as<uint32_t>());
         }
 
         d_policy.period = d_period.to_duration_t();
@@ -326,7 +326,7 @@ void Publisher::get_qos_from_config(
 
         if (config["lifespan"]["nanosec"])
         {
-            life_duration.nanosec(config["lifespan"]["sec"].as<uint32_t>());
+            life_duration.nanosec(config["lifespan"]["nanosec"].as<uint32_t>());
         }
 
         life_policy.duration = life_duration.to_duration_t();
@@ -365,7 +365,7 @@ void Publisher::get_qos_from_config(
 
         if (config["liveliness"]["nanosec"])
         {
-            live_duration.nanosec(config["liveliness"]["sec"].as<uint32_t>());
+            live_duration.nanosec(config["liveliness"]["nanosec"].as<uint32_t>());
             lease_duration_changed = true;
         }
 
