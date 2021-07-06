@@ -79,6 +79,7 @@ enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
 compile_test(${PROJECT_NAME}_primitive_msgs SOURCE integration/ros2__primitives_msgs.cpp)
+compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
 if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
@@ -89,7 +90,7 @@ endif()
 set(test_msgs_config_file "ros2__test_msgs.yaml")
 
 set_property(
-    TARGET ${PROJECT_NAME}_geometry_msgs ${PROJECT_NAME}_test_domain ${PROJECT_NAME}_primitive_msgs
+    TARGET ${PROJECT_NAME}_geometry_msgs ${PROJECT_NAME}_test_domain ${PROJECT_NAME}_primitive_msgs ${PROJECT_NAME}_test_qos
     APPEND PROPERTY COMPILE_DEFINITIONS PRIVATE
         "ROS2__GEOMETRY_MSGS__PUBSUB__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs__pubsub.yaml\""
         "ROS2__GEOMETRY_MSGS__SERVICES__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs__services.yaml\""
