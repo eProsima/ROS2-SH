@@ -55,33 +55,20 @@ public:
             TopicSubscriberSystem::SubscriptionCallback* callback,
             const std::string& topic_name,
             const xtypes::DynamicType& message_type,
-            const rmw_qos_profile_t& qos_profile)
+            const rclcpp::QoS& qos_profile)
         : _callback(callback)
         , _message_type(message_type)
     {
-
-#ifndef RCLCPP__QOS_HPP_
-        _subscription = node.create_subscription<Ros2_Msg>(
-            topic_name,
-            [=](Ros2_Msg::UniquePtr msg)
-            {
-                this->subscription_callback(*msg);
-            },
-            qos_profile,
-            nullptr, // CallbackGroup::SharedPtr default value
-            true); // subscription_options.ignore_local_publications
-#else
         auto subscription_options = rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>>();
         subscription_options.ignore_local_publications = true; // Enable ignore_local_publications option
         _subscription = node.create_subscription<Ros2_Msg>(
             topic_name,
-            rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile)),
+            qos_profile,
             [=](Ros2_Msg::UniquePtr msg)
             {
                 this->subscription_callback(*msg);
             },
             subscription_options);
-#endif // ifndef RCLCPP__QOS_HPP_
     }
 
 private:
@@ -111,7 +98,7 @@ std::shared_ptr<void> subscribe(
         const std::string& topic_name,
         const xtypes::DynamicType& message_type,
         TopicSubscriberSystem::SubscriptionCallback* callback,
-        const rmw_qos_profile_t& qos_profile)
+        const rclcpp::QoS& qos_profile)
 {
     return std::make_shared<Subscription>(
         node, callback, topic_name, message_type, qos_profile);
@@ -129,17 +116,11 @@ public:
     Publisher(
             rclcpp::Node& node,
             const std::string& topic_name,
-            const rmw_qos_profile_t& qos_profile)
+            const rclcpp::QoS& qos_profile)
     {
-#ifndef RCLCPP__QOS_HPP_
-        // If the rclcpp/qos.hpp header does not exist, then we assume that we
-        // are in crystal
-        _publisher = node.create_publisher<Ros2_Msg>(topic_name, qos_profile);
-#else
         _publisher = node.create_publisher<Ros2_Msg>(
             topic_name,
-            rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile)));
-#endif // ifndef RCLCPP__QOS_HPP_
+            qos_profile);
     }
 
     bool publish(
@@ -162,7 +143,7 @@ private:
 std::shared_ptr<is::TopicPublisher> make_publisher(
         rclcpp::Node& node,
         const std::string& topic_name,
-        const rmw_qos_profile_t& qos_profile)
+        const rclcpp::QoS& qos_profile)
 {
     return std::make_shared<Publisher>(node, topic_name, qos_profile);
 }

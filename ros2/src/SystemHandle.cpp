@@ -36,30 +36,31 @@ namespace ros2 {
 
 namespace {
 
-rmw_qos_profile_t parse_rmw_qos_configuration(
-        const YAML::Node& configuration)
+rclcpp::QoS parse_rmw_qos_configuration(
+        const YAML::Node& configuration,
+        utils::Logger& _logger)
 {
-    rmw_qos_profile_t qos = rmw_qos_profile_default;
+    rclcpp::QoS qos();
 
     if (configuration)
     {
         logger_ << utils::Logger::Level::DEBUG
-                    << "Publisher created with QoS: " << YAML::Dump(config) << std::endl;
+                    << "Entity created with QoS: " << YAML::Dump(configuration) << std::endl;
 
 
         // Configure datawriter QoS according to config node
-        if (config["history"])
+        if (configuration["history"])
         {
-            if (config["history"]["kind"])
+            if (configuration["history"]["kind"])
             {
-                std::string hist_kind = config["history"]["kind"].as<std::string>();
+                std::string hist_kind = configuration["history"]["kind"].as<std::string>();
                 if (hist_kind == "KEEP_LAST")
                 {
-                    qos.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
+                    qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
                 }
                 else if (hist_kind == "KEEP_ALL")
                 {
-                    qos.history = RMW_QOS_POLICY_HISTORY_KEEP_ALL;
+                    qos.history(RMW_QOS_POLICY_HISTORY_KEEP_ALL);
                 }
                 else
                 {
@@ -69,22 +70,22 @@ rmw_qos_profile_t parse_rmw_qos_configuration(
                 }
             }
 
-            if (config["history"]["depth"])
+            if (configuration["history"]["depth"])
             {
-                qos.depth = config["history"]["depth"].as<int>();
+                qos.depth = configuration["history"]["depth"].as<int>();
             }
         }
 
-        if (config["reliability"])
+        if (configuration["reliability"])
         {
-            std::string rel_kind = config["reliability"].as<std::string>();
+            std::string rel_kind = configuration["reliability"].as<std::string>();
             if (rel_kind == "RELIABLE")
             {
-                qos.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+                qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
             }
             else if (rel_kind == "BEST_EFFORT")
             {
-                qos.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
+                qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
             }
             else
             {
@@ -94,16 +95,16 @@ rmw_qos_profile_t parse_rmw_qos_configuration(
             }
         }
 
-        if (config["durability"])
+        if (configuration["durability"])
         {
-            std::string dur_kind = config["durability"].as<std::string>();
+            std::string dur_kind = configuration["durability"].as<std::string>();
             if (dur_kind == "VOLATILE")
             {
-                qos.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
+                qos.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
             }
             else if (dur_kind == "TRANSIENT_LOCAL")
             {
-                qos.durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
+                qos.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
             }
             else
             {
@@ -113,50 +114,50 @@ rmw_qos_profile_t parse_rmw_qos_configuration(
             }
         }
 
-        if (config["deadline"])
+        if (configuration["deadline"])
         {
             rmw_time_t period;
-            if (config["deadline"]["sec"])
+            if (configuration["deadline"]["sec"])
             {
-                period.sec = config["deadline"]["sec"].as<uint64_t>();
+                period.sec = configuration["deadline"]["sec"].as<uint64_t>();
             }
 
-            if (config["deadline"]["nanosec"])
+            if (configuration["deadline"]["nanosec"])
             {
-                period.nsec = config["deadline"]["nanosec"].as<uint64_t>();
+                period.nsec = configuration["deadline"]["nanosec"].as<uint64_t>();
             }
 
             qos.deadline = period;
         }
 
-        if (config["lifespan"])
+        if (configuration["lifespan"])
         {
             rmw_time_t duration;
-            if (config["lifespan"]["sec"])
+            if (configuration["lifespan"]["sec"])
             {
-                duration.sec = config["lifespan"]["sec"].as<uint64_t>();
+                duration.sec = configuration["lifespan"]["sec"].as<uint64_t>();
             }
 
-            if (config["lifespan"]["nanosec"])
+            if (configuration["lifespan"]["nanosec"])
             {
-                duration.nsec = config["lifespan"]["nanosec"].as<uint64_t>();
+                duration.nsec = configuration["lifespan"]["nanosec"].as<uint64_t>();
             }
 
             qos.lifespan = duration;
         }
 
-        if (config["liveliness"])
+        if (configuration["liveliness"])
         {
-            if (config["liveliness"]["kind"])
+            if (configuration["liveliness"]["kind"])
             {
-                std::string live_kind = config["liveliness"]["kind"].as<std::string>();
+                std::string live_kind = configuration["liveliness"]["kind"].as<std::string>();
                 if (live_kind == "AUTOMATIC")
                 {
-                    qos.liveliness = RMW_QOS_POLICY_LIVELINESS_AUTOMATIC;
+                    qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
                 }
                 else if (live_kind == "MANUAL_BY_TOPIC")
                 {
-                    qos.liveliness = RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC;
+                    qos.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
                 }
                 else
                 {
@@ -167,14 +168,14 @@ rmw_qos_profile_t parse_rmw_qos_configuration(
             }
 
             rmw_time_t lease_duration;
-            if (config["liveliness"]["sec"])
+            if (configuration["liveliness"]["sec"])
             {
-                lease_duration.sec = config["liveliness"]["sec"].as<uint64_t>();
+                lease_duration.sec = configuration["liveliness"]["sec"].as<uint64_t>();
             }
 
-            if (config["liveliness"]["nanosec"])
+            if (configuration["liveliness"]["nanosec"])
             {
-                lease_duration.nsec = config["liveliness"]["sec"].as<uint64_t>();
+                lease_duration.nsec = configuration["liveliness"]["sec"].as<uint64_t>();
             }
 
             qos.liveliness_lease_duration = lease_duration;
@@ -440,7 +441,7 @@ bool SystemHandle::subscribe(
 {
     auto subscription = Factory::instance().create_subscription(
         message_type, *_node, topic_name, callback,
-        parse_rmw_qos_configuration(configuration));
+        parse_rmw_qos_configuration(configuration["qos"], _logger));
 
     if (!subscription)
     {
@@ -489,14 +490,14 @@ std::shared_ptr<TopicPublisher> SystemHandle::advertise(
         // runtime substitutions.
         publisher = make_meta_publisher(
             message_type, *_node, topic_name,
-            parse_rmw_qos_configuration(configuration),
+            parse_rmw_qos_configuration(configuration["qos"], _logger),
             configuration);
     }
     else
     {
         publisher = Factory::instance().create_publisher(
             message_type, *_node, topic_name,
-            parse_rmw_qos_configuration(configuration));
+            parse_rmw_qos_configuration(configuration["qos"], _logger));
     }
 
     if (nullptr != publisher)
@@ -528,7 +529,7 @@ bool SystemHandle::create_client_proxy(
 {
     auto client_proxy = Factory::instance().create_client_proxy(
         service_type.name(), *_node, service_name, callback,
-        parse_rmw_qos_configuration(configuration));
+        parse_rmw_qos_configuration(configuration["qos"], _logger).get_rmw_qos_profile());
 
     if (!client_proxy)
     {
@@ -561,7 +562,7 @@ std::shared_ptr<ServiceProvider> SystemHandle::create_service_proxy(
 {
     auto server_proxy = Factory::instance().create_server_proxy(
         service_type.name(), *_node, service_name,
-        parse_rmw_qos_configuration(configuration));
+        parse_rmw_qos_configuration(configuration["qos"], _logger).get_rmw_qos_profile());
 
     if (!server_proxy)
     {
