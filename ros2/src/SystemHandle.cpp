@@ -40,11 +40,11 @@ rclcpp::QoS parse_rmw_qos_configuration(
         const YAML::Node& configuration,
         utils::Logger& _logger)
 {
-    rclcpp::QoS qos();
+    rclcpp::QoS qos(10);
 
     if (configuration)
     {
-        logger_ << utils::Logger::Level::DEBUG
+        _logger << utils::Logger::Level::DEBUG
                     << "Entity created with QoS: " << YAML::Dump(configuration) << std::endl;
 
 
@@ -64,7 +64,7 @@ rclcpp::QoS parse_rmw_qos_configuration(
                 }
                 else
                 {
-                    logger_ << utils::Logger::Level::WARN
+                    _logger << utils::Logger::Level::WARN
                             << "History QoS kind is unknown. "
                             << "The valid values are: KEEP_LAST and KEEP_ALL." << std::endl;
                 }
@@ -72,7 +72,7 @@ rclcpp::QoS parse_rmw_qos_configuration(
 
             if (configuration["history"]["depth"])
             {
-                qos.depth = configuration["history"]["depth"].as<int>();
+                qos.keep_last(configuration["history"]["depth"].as<size_t>());
             }
         }
 
@@ -89,7 +89,7 @@ rclcpp::QoS parse_rmw_qos_configuration(
             }
             else
             {
-                logger_ << utils::Logger::Level::WARN
+                _logger << utils::Logger::Level::WARN
                         << "Reliability QoS kind is unknown. "
                         << "The valid values are: RELIABLE and BEST_EFFORT." << std::endl;
             }
@@ -101,14 +101,18 @@ rclcpp::QoS parse_rmw_qos_configuration(
             if (dur_kind == "VOLATILE")
             {
                 qos.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
+                _logger << utils::Logger::Level::DEBUG
+                        << "Setting Durability QoS kind to VOLATILE." << std::endl;
             }
             else if (dur_kind == "TRANSIENT_LOCAL")
             {
                 qos.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
+                _logger << utils::Logger::Level::DEBUG
+                        << "Setting Durability QoS kind to TRANSIENT_LOCAL." << std::endl;
             }
             else
             {
-                logger_ << utils::Logger::Level::WARN
+                _logger << utils::Logger::Level::WARN
                         << "Durability QoS kind is unknown. "
                         << "The valid values are: VOLATILE and TRANSIENT_LOCAL." << std::endl;
             }
@@ -116,7 +120,7 @@ rclcpp::QoS parse_rmw_qos_configuration(
 
         if (configuration["deadline"])
         {
-            rmw_time_t period;
+            rmw_time_t period = {0, 0};
             if (configuration["deadline"]["sec"])
             {
                 period.sec = configuration["deadline"]["sec"].as<uint64_t>();
@@ -127,12 +131,12 @@ rclcpp::QoS parse_rmw_qos_configuration(
                 period.nsec = configuration["deadline"]["nanosec"].as<uint64_t>();
             }
 
-            qos.deadline = period;
+            qos.deadline(period);
         }
 
         if (configuration["lifespan"])
         {
-            rmw_time_t duration;
+            rmw_time_t duration = {0, 0};
             if (configuration["lifespan"]["sec"])
             {
                 duration.sec = configuration["lifespan"]["sec"].as<uint64_t>();
@@ -143,7 +147,7 @@ rclcpp::QoS parse_rmw_qos_configuration(
                 duration.nsec = configuration["lifespan"]["nanosec"].as<uint64_t>();
             }
 
-            qos.lifespan = duration;
+            qos.lifespan(duration);
         }
 
         if (configuration["liveliness"])
@@ -161,13 +165,13 @@ rclcpp::QoS parse_rmw_qos_configuration(
                 }
                 else
                 {
-                    logger_ << utils::Logger::Level::WARN
+                    _logger << utils::Logger::Level::WARN
                             << "Liveliness QoS kind is unknown. "
                             << "The valid values are: AUTOMATIC and MANUAL_BY_TOPIC." << std::endl;
                 }
             }
 
-            rmw_time_t lease_duration;
+            rmw_time_t lease_duration = {0, 0};
             if (configuration["liveliness"]["sec"])
             {
                 lease_duration.sec = configuration["liveliness"]["sec"].as<uint64_t>();
@@ -178,7 +182,7 @@ rclcpp::QoS parse_rmw_qos_configuration(
                 lease_duration.nsec = configuration["liveliness"]["sec"].as<uint64_t>();
             }
 
-            qos.liveliness_lease_duration = lease_duration;
+            qos.liveliness_lease_duration(lease_duration);
         }
     }
 
