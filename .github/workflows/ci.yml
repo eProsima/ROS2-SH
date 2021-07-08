@@ -37,7 +37,7 @@ jobs:
 
       - name: Download the Integration Service
         run: |
-          git clone --recursive https://github.com/eProsima/Integration-Service src/integration-service -b feature/qos
+          git clone --recursive https://github.com/eProsima/Integration-Service src/integration-service
 
       - name: Build
         run: |
