@@ -119,7 +119,7 @@ public:
                         const std::string& topic_name,
                         const xtypes::DynamicType& message_type,
                         TopicSubscriberSystem::SubscriptionCallback* callback,
-                        const rmw_qos_profile_t& qos_profile)>;
+                        const rclcpp::QoS& qos_profile)>;
 
     /**
      * @brief Register a ROS 2 subscription builder within the Factory.
@@ -154,7 +154,7 @@ public:
             rclcpp::Node& node,
             const std::string& topic_name,
             TopicSubscriberSystem::SubscriptionCallback* callback,
-            const rmw_qos_profile_t& qos_profile);
+            const rclcpp::QoS& qos_profile);
 
     /**
      * @brief Signature for the method that will be used to create a ROS 2 publisher
@@ -175,7 +175,7 @@ public:
             std::function<std::shared_ptr<TopicPublisher>(
                         rclcpp::Node& node,
                         const std::string& topic_name,
-                        const rmw_qos_profile_t& qos_profile)>;
+                        const rclcpp::QoS& qos_profile)>;
 
     /**
      * @brief Register a ROS 2 publisher builder within the Factory.
@@ -206,7 +206,7 @@ public:
             const xtypes::DynamicType& topic_type,
             rclcpp::Node& node,
             const std::string& topic_name,
-            const rmw_qos_profile_t& qos_profile);
+            const rclcpp::QoS& qos_profile);
 
     /**
      * @brief Signature for the method that will be used to create a ROS 2 service client
@@ -271,7 +271,7 @@ public:
      * @brief Signature for the method that will be used to create a ROS 2 service server
      *        to a certain service, within the service servers factory.
      *
-     * @details 
+     * @details
      *          It allows to specify the associated ROS 2 node and the service name.
      *
      *          This Factory method returns a pointer containing the *Integration Service*

@@ -52,7 +52,7 @@ std::shared_ptr<TopicPublisher> make_meta_publisher(
         const eprosima::xtypes::DynamicType& message_type,
         rclcpp::Node& node,
         const std::string& topic_name,
-        const rmw_qos_profile_t& qos_profile,
+        const rclcpp::QoS& qos_profile,
         const YAML::Node& configuration);
 
 } //  namespace ros2

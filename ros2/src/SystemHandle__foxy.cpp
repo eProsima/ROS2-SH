@@ -60,12 +60,157 @@ int unset_platform_env(
 #endif // WIN32
 }
 
-rmw_qos_profile_t parse_rmw_qos_configuration(
-        const YAML::Node& /*configuration*/)
+rclcpp::QoS parse_rmw_qos_configuration(
+        const YAML::Node& configuration,
+        utils::Logger& _logger)
 {
-    // TODO(MXG): Parse the configuration node
-    // This is currently considered low-priority
-    return rmw_qos_profile_default;
+    rclcpp::QoS qos(10);
+
+    if (configuration)
+    {
+        _logger << utils::Logger::Level::DEBUG
+                    << "Entity created with QoS: " << YAML::Dump(configuration) << std::endl;
+
+
+        // Configure datawriter QoS according to config node
+        if (configuration["history"])
+        {
+            if (configuration["history"]["kind"])
+            {
+                std::string hist_kind = configuration["history"]["kind"].as<std::string>();
+                if (hist_kind == "KEEP_LAST")
+                {
+                    qos.history(RMW_QOS_POLICY_HISTORY_KEEP_LAST);
+                }
+                else if (hist_kind == "KEEP_ALL")
+                {
+                    qos.history(RMW_QOS_POLICY_HISTORY_KEEP_ALL);
+                }
+                else
+                {
+                    _logger << utils::Logger::Level::WARN
+                            << "History QoS kind is unknown. "
+                            << "The valid values are: KEEP_LAST and KEEP_ALL." << std::endl;
+                }
+            }
+
+            if (configuration["history"]["depth"])
+            {
+                qos.keep_last(configuration["history"]["depth"].as<size_t>());
+            }
+        }
+
+        if (configuration["reliability"])
+        {
+            std::string rel_kind = configuration["reliability"].as<std::string>();
+            if (rel_kind == "RELIABLE")
+            {
+                qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+            }
+            else if (rel_kind == "BEST_EFFORT")
+            {
+                qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+            }
+            else
+            {
+                _logger << utils::Logger::Level::WARN
+                        << "Reliability QoS kind is unknown. "
+                        << "The valid values are: RELIABLE and BEST_EFFORT." << std::endl;
+            }
+        }
+
+        if (configuration["durability"])
+        {
+            std::string dur_kind = configuration["durability"].as<std::string>();
+            if (dur_kind == "VOLATILE")
+            {
+                qos.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
+                _logger << utils::Logger::Level::DEBUG
+                        << "Setting Durability QoS kind to VOLATILE." << std::endl;
+            }
+            else if (dur_kind == "TRANSIENT_LOCAL")
+            {
+                qos.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
+                _logger << utils::Logger::Level::DEBUG
+                        << "Setting Durability QoS kind to TRANSIENT_LOCAL." << std::endl;
+            }
+            else
+            {
+                _logger << utils::Logger::Level::WARN
+                        << "Durability QoS kind is unknown. "
+                        << "The valid values are: VOLATILE and TRANSIENT_LOCAL." << std::endl;
+            }
+        }
+
+        if (configuration["deadline"])
+        {
+            rmw_time_t period = {0, 0};
+            if (configuration["deadline"]["sec"])
+            {
+                period.sec = configuration["deadline"]["sec"].as<uint64_t>();
+            }
+
+            if (configuration["deadline"]["nanosec"])
+            {
+                period.nsec = configuration["deadline"]["nanosec"].as<uint64_t>();
+            }
+
+            qos.deadline(period);
+        }
+
+        if (configuration["lifespan"])
+        {
+            rmw_time_t duration = {0, 0};
+            if (configuration["lifespan"]["sec"])
+            {
+                duration.sec = configuration["lifespan"]["sec"].as<uint64_t>();
+            }
+
+            if (configuration["lifespan"]["nanosec"])
+            {
+                duration.nsec = configuration["lifespan"]["nanosec"].as<uint64_t>();
+            }
+
+            qos.lifespan(duration);
+        }
+
+        if (configuration["liveliness"])
+        {
+            if (configuration["liveliness"]["kind"])
+            {
+                std::string live_kind = configuration["liveliness"]["kind"].as<std::string>();
+                if (live_kind == "AUTOMATIC")
+                {
+                    qos.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
+                }
+                else if (live_kind == "MANUAL_BY_TOPIC")
+                {
+                    qos.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+                }
+                else
+                {
+                    _logger << utils::Logger::Level::WARN
+                            << "Liveliness QoS kind is unknown. "
+                            << "The valid values are: AUTOMATIC and MANUAL_BY_TOPIC." << std::endl;
+                }
+            }
+
+            rmw_time_t lease_duration = {0, 0};
+            if (configuration["liveliness"]["sec"])
+            {
+                lease_duration.sec = configuration["liveliness"]["sec"].as<uint64_t>();
+            }
+
+            if (configuration["liveliness"]["nanosec"])
+            {
+                lease_duration.nsec = configuration["liveliness"]["sec"].as<uint64_t>();
+            }
+
+            qos.liveliness_lease_duration(lease_duration);
+        }
+    }
+
+    return qos;
 }
 
 } //  anonymous namespace
@@ -349,7 +494,7 @@ bool SystemHandle::subscribe(
 {
     auto subscription = Factory::instance().create_subscription(
         message_type, *_node, topic_name, callback,
-        parse_rmw_qos_configuration(configuration));
+        parse_rmw_qos_configuration(configuration["qos"], _logger));
 
     if (!subscription)
     {
@@ -398,14 +543,14 @@ std::shared_ptr<TopicPublisher> SystemHandle::advertise(
         // runtime substitutions.
         publisher = make_meta_publisher(
             message_type, *_node, topic_name,
-            parse_rmw_qos_configuration(configuration),
+            parse_rmw_qos_configuration(configuration["qos"], _logger),
             configuration);
     }
     else
     {
         publisher = Factory::instance().create_publisher(
             message_type, *_node, topic_name,
-            parse_rmw_qos_configuration(configuration));
+            parse_rmw_qos_configuration(configuration["qos"], _logger));
     }
 
     if (nullptr != publisher)
@@ -437,7 +582,7 @@ bool SystemHandle::create_client_proxy(
 {
     auto client_proxy = Factory::instance().create_client_proxy(
         service_type.name(), *_node, service_name, callback,
-        parse_rmw_qos_configuration(configuration));
+        parse_rmw_qos_configuration(configuration["qos"], _logger).get_rmw_qos_profile());
 
     if (!client_proxy)
     {
@@ -470,7 +615,7 @@ std::shared_ptr<ServiceProvider> SystemHandle::create_service_proxy(
 {
     auto server_proxy = Factory::instance().create_server_proxy(
         service_type.name(), *_node, service_name,
-        parse_rmw_qos_configuration(configuration));
+        parse_rmw_qos_configuration(configuration["qos"], _logger).get_rmw_qos_profile());
 
     if (!server_proxy)
     {

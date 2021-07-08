@@ -33,7 +33,7 @@ jobs:
       - name: Download required dependencies
         run: |
           apt update
-          DEBIAN_FRONTEND=noninteractive apt install -y cmake gcc g++ git libboost-dev libboost-program-options-dev libyaml-cpp-dev
+          DEBIAN_FRONTEND=noninteractive apt install -y cmake gcc g++ git libboost-dev libboost-program-options-dev libyaml-cpp-dev ros-${{ matrix.node }}-rmw-fastrtps-cpp
 
       - name: Download the Integration Service
         run: |
@@ -46,5 +46,5 @@ jobs:
 
       - name: Test
         run: |
-          . /opt/ros/${{ matrix.node }}/setup.sh && . install/local_setup.sh && colcon test --packages-select is-ros2 --event-handlers console_direct+
+          . /opt/ros/${{ matrix.node }}/setup.sh && . install/local_setup.sh && RMW_IMPLEMENTATION=rmw_fastrtps_cpp colcon test --packages-select is-ros2 --event-handlers console_direct+
           colcon test-result

@@ -40,7 +40,7 @@ public:
             const core::StringTemplate&& topic_template,
             const eprosima::xtypes::DynamicType& message_type,
             rclcpp::Node& node,
-            const rmw_qos_profile_t& qos_profile,
+            const rclcpp::QoS& qos_profile,
             const YAML::Node& /*unused*/)
         : _topic_template(std::move(topic_template))
         , _message_type(message_type)
@@ -74,7 +74,7 @@ private:
     const core::StringTemplate _topic_template;
     const eprosima::xtypes::DynamicType& _message_type;
     rclcpp::Node& _node;
-    const rmw_qos_profile_t _qos_profile;
+    const rclcpp::QoS _qos_profile;
 
     using TopicPublisherPtr = std::shared_ptr<TopicPublisher>;
     using PublisherMap = std::unordered_map<std::string, TopicPublisherPtr>;
@@ -100,7 +100,7 @@ std::shared_ptr<is::TopicPublisher> make_meta_publisher(
         const eprosima::xtypes::DynamicType& message_type,
         rclcpp::Node& node,
         const std::string& topic_name,
-        const rmw_qos_profile_t& qos_profile,
+        const rclcpp::QoS& qos_profile,
         const YAML::Node& configuration)
 {
     return std::make_shared<MetaPublisher>(

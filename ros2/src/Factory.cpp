@@ -72,7 +72,7 @@ public:
             rclcpp::Node& node,
             const std::string& topic_name,
             TopicSubscriberSystem::SubscriptionCallback* callback,
-            const rmw_qos_profile_t& qos_profile)
+            const rclcpp::QoS& qos_profile)
     {
         auto it = _subscription_factories.find(topic_type.name());
         if (it == _subscription_factories.end())
@@ -98,7 +98,7 @@ public:
             const xtypes::DynamicType& topic_type,
             rclcpp::Node& node,
             const std::string& topic_name,
-            const rmw_qos_profile_t& qos_profile)
+            const rclcpp::QoS& qos_profile)
     {
         auto it = _publisher_factories.find(topic_type.name());
         if (it == _publisher_factories.end())
@@ -215,7 +215,7 @@ std::shared_ptr<void> Factory::create_subscription(
         rclcpp::Node& node,
         const std::string& topic_name,
         TopicSubscriberSystem::SubscriptionCallback* callback,
-        const rmw_qos_profile_t& qos_profile)
+        const rclcpp::QoS& qos_profile)
 {
     return _pimpl->create_subscription(
         topic_type, node, topic_name, callback, qos_profile);
@@ -235,7 +235,7 @@ std::shared_ptr<TopicPublisher> Factory::create_publisher(
         const xtypes::DynamicType& topic_type,
         rclcpp::Node& node,
         const std::string& topic_name,
-        const rmw_qos_profile_t& qos_profile)
+        const rclcpp::QoS& qos_profile)
 {
     return _pimpl->create_publisher(
         topic_type, node, topic_name, qos_profile);
