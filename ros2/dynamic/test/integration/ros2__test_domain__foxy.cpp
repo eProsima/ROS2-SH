@@ -36,7 +36,7 @@
 namespace is = eprosima::is;
 namespace xtypes = eprosima::xtypes;
 
-static is::utils::Logger logger("is::sh::ROS2::test::test_domain");
+static is::utils::Logger logger("is::sh::ROS2_Dynamic::test::test_domain");
 
 constexpr const char* DOMAIN_ID_1 = "5";
 constexpr const char* DOMAIN_ID_2 = "10";

@@ -38,7 +38,7 @@
 namespace is = eprosima::is;
 namespace xtypes = eprosima::xtypes;
 
-static is::utils::Logger logger("is::sh::ROS2::test::geometry_msgs");
+static is::utils::Logger logger("is::sh::ROS2_Dynamic::test::geometry_msgs");
 
 const std::string print_pose(
         const geometry_msgs::msg::PoseStamped& ros2_pose)

@@ -51,8 +51,6 @@ macro(compile_test)
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
     	)
 
-    message(WARNING "INCLUDE PATH ${CMAKE_INSTALL_PREFIX}/include")
-
     target_include_directories(${TEST_NAME}
         PRIVATE
             ${geometry_msgs_INCLUDE_DIRS}
@@ -79,6 +77,7 @@ enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
 compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp ENVIRONMENTS "ROS2_DISTRO=${IS_ROS2_DISTRO}")
+compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
 if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
@@ -93,6 +92,7 @@ set_property(
         ${PROJECT_NAME}_check_ros2pkg_creation
         ${PROJECT_NAME}_geometry_msgs
         ${PROJECT_NAME}_test_domain
+        ${PROJECT_NAME}_test_qos
     APPEND PROPERTY COMPILE_DEFINITIONS PRIVATE
         "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
     )
