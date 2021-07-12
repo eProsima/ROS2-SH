@@ -72,7 +72,7 @@ five sections described in the *Configuration* chapter of the *Integration Servi
 
   * `domain`: Provides with an easy way to change the *Domain ID* of the ROS 2 entities created
     by the *ROS 2 System Handle*.
-    
+
 * `topics`: The topic `route` must contain `ros2` within its `from` or `to` fields. Additionally,
   the *ROS 2 System Handle* accepts the following topic specific configuration parameters, within the
   `ros2` specific middleware configuration tag:
@@ -85,37 +85,37 @@ five sections described in the *Configuration* chapter of the *Integration Servi
     hello_ros1:
       type: std_msgs/String
       route: ros2_to_ros1
-      ros2: { qos: { 
+      ros2: { qos: {
           deadline: { sec: 1, nanosec: 10},
           durability: VOLATILE,
-          history: { kind: KEEP_LAST, depth: 10 }, 
+          history: { kind: KEEP_LAST, depth: 10 },
           lifespan: { sec: 2, nanosec: 20 },
-          liveliness: { kind: AUTOMATIC, sec: 2, nanosec: 0 }, 
+          liveliness: { kind: AUTOMATIC, sec: 2, nanosec: 0 },
           reliability: RELIABLE
         }}
   ```
 
   * `qos`: The Quality of Service policies that are going to be applied to the ROS 2 entity involved in the pub-sub operation (in this case the publisher).
     This parameter accepts any of the QoS available for ROS 2:
-    * `deadline`: This QoS policy raises an alarm when the frequency of new samples falls below a certain threshold, which can be defined by means of the 
-      `sec` and `nanosec` tags. 
-      On the publishing side, the deadline defines the maximum period in which the application is expected to supply a new sample. 
+    * `deadline`: This QoS policy raises an alarm when the frequency of new samples falls below a certain threshold, which can be defined by means of the
+      `sec` and `nanosec` tags.
+      On the publishing side, the deadline defines the maximum period in which the application is expected to supply a new sample.
       On the subscribing side, it defines the maximum period in which new samples should be received.
-    * `durability`: A Publisher can send messages throughout a Topic even if there are no Subscribers on the network. This QoS defines how the system will 
+    * `durability`: A Publisher can send messages throughout a Topic even if there are no Subscribers on the network. This QoS defines how the system will
       behave regarding those samples that existed on the Topic before the Subscriber joins. There are two possible values: `VOLATILE` and `TRANSIENT_LOCAL`.
-    * `history`: This QoS controls the behavior of the system when the value of an instance changes one or more times before it can be successfully 
-      communicated to the existing Subscriber entities. 
-      * `kind`: Controls if the service should deliver only the most recent values, all the intermediate values or do something in between. There are two 
+    * `history`: This QoS controls the behavior of the system when the value of an instance changes one or more times before it can be successfully
+      communicated to the existing Subscriber entities.
+      * `kind`: Controls if the service should deliver only the most recent values, all the intermediate values or do something in between. There are two
         possible values: `KEEP_LAST` and `KEEP_ALL`.
       * `depth`: Establishes the maximum number of samples that must be kept on the history. It only has effect if the kind is set to `KEEP_LAST`.
     * `lifespan`: Each data sample written by a Publisher has an associated expiration time beyond which the data is removed from the Publisher and Subscriber
        history. That expiration time can be defined by means of the `sec` and `nanosec` tags.
-    * `liveliness`: This QoS controls the mechanism used by the service to ensure that a particular entity on the network is still alive. 
-      * `kind`: Establishes if the service needs to assert the liveliness automatically or if it needs to wait until the liveliness is asserted by the 
+    * `liveliness`: This QoS controls the mechanism used by the service to ensure that a particular entity on the network is still alive.
+      * `kind`: Establishes if the service needs to assert the liveliness automatically or if it needs to wait until the liveliness is asserted by the
         publishing side. There are two possible values: `AUTOMATIC` and `MANUAL_BY_TOPIC`.
-      * `lease_duration`: Amount of time to wait since the last time the Publisher asserts its liveliness to consider that it is no longer alive. It can be 
+      * `lease_duration`: Amount of time to wait since the last time the Publisher asserts its liveliness to consider that it is no longer alive. It can be
         defined by means of the `sec` and `nanosec` tags.
-    * `reliability`: This QoS indicates the level of reliability offered and requested by the service. 
+    * `reliability`: This QoS indicates the level of reliability offered and requested by the service.
       There are two possible values: `RELIABLE` and `BEST_EFFORT`.
 
 ## Examples
@@ -228,6 +228,21 @@ a subscriber created under domain ID **10**.
 
 The configuration file for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/ros2__domain_id_change.yaml).
+
+For a detailed step by step guide on how to build and test this example, please refer to the
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html) in the official documentation.
+
+### ROS 2 Quality of Service
+
+In this example, *Integration Service* uses this *ROS 2 System Handle*
+to forward messages from a *ROS 2* publisher with a specific QoS to the compatible *DDS* subscribers.
+
+<p align="center">
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html"><img src="docs/images/ros2_qos_example.png" width="580"></a>
+</p>
+
+The configuration file for this example can be found
+[here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/fastdds_ros2__qos_helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
 [dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html) in the official documentation.
