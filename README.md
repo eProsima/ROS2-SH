@@ -232,7 +232,7 @@ The configuration file for this example can be found
 For a detailed step by step guide on how to build and test this example, please refer to the
 [dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html) in the official documentation.
 
-<a href="https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
+<a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/dds-ros2-qos.html"><img align="left" width="15" height="38" src="https://via.placeholder.com/15/40c15d/000000?text=+" alt="Green icon"></a>
 
 ### ROS 2 Quality of Service
 
@@ -240,14 +240,14 @@ In this example, *Integration Service* uses this *ROS 2 System Handle*
 to forward messages from a *ROS 2* publisher with a specific QoS to the compatible *DDS* subscribers.
 
 <p align="center">
-  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html"><img src="docs/images/ros2_qos_example.png" width="580"></a>
+  <a href="https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/dds-ros2-qos.html"><img src="docs/images/ros2_qos_example.png" width="580"></a>
 </p>
 
 The configuration file for this example can be found
 [here](https://github.com/eProsima/Integration-Service/blob/main/examples/basic/fastdds_ros2__qos_helloworld.yaml).
 
 For a detailed step by step guide on how to build and test this example, please refer to the
-[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/same_protocol/ros2_change_domain.html) in the official documentation.
+[dedicated section](https://integration-service.docs.eprosima.com/en/latest/examples/different_protocols/pubsub/dds-ros2-qos.html) in the official documentation.
 
 
 ## Compilation flags
