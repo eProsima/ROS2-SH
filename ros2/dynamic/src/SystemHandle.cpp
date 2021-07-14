@@ -58,6 +58,7 @@ public:
 
     SystemHandle()
         : FullSystem()
+        , allow_internal(false)
         , logger_("is::sh::ROS2_Dynamic")
     {
     }
@@ -95,6 +96,12 @@ public:
 
                 return false;
             }
+        }
+
+        // If true allows the communication between internal publishers and subscribers in the same topic
+        if (configuration["allow_internal"])
+        {
+            allow_internal = configuration["allow_internal"].as<bool>();
         }
 
         try
@@ -158,7 +165,7 @@ public:
 
         auto sample_writer_guid = fastrtps::rtps::iHandle2GUID(sample_info->publication_handle);
 
-        if (sample_writer_guid.guidPrefix == participant_->get_dds_participant()->guid().guidPrefix)
+        if (sample_writer_guid.guidPrefix == participant_->get_dds_participant()->guid().guidPrefix && !allow_internal)
         {
             if (utils::Logger::Level::DEBUG == logger_.get_level())
             {
@@ -790,6 +797,8 @@ private:
     //std::map<std::string, std::shared_ptr<Server> > servers_;
 
     std::string namespace_;
+
+    bool allow_internal;
 
     std::set<std::string> package_names;
 
