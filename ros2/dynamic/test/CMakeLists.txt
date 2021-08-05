@@ -23,10 +23,10 @@ cmake_minimum_required(VERSION 3.5.0)
 
 # Get Integration Service dependencies
 find_package(is-mock REQUIRED)
+find_package(rclcpp REQUIRED)
 
 # Get message dependencies
 find_package(geometry_msgs REQUIRED)
-find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
 macro(compile_test)
@@ -36,7 +36,7 @@ macro(compile_test)
     else()
         set(TEST_NAME "${ARGV0}")
     endif()
-    set(multiValueArgs SOURCE)
+    set(multiValueArgs SOURCE ENVIRONMENTS)
     cmake_parse_arguments(TEST "" "${uniValueArgs}" "${multiValueArgs}" ${ARGN})
 
     add_executable(${TEST_NAME} ${TEST_SOURCE})
@@ -46,7 +46,6 @@ macro(compile_test)
             is::mock
             ${rclcpp_LIBRARIES}
             ${geometry_msgs_LIBRARIES}
-            ${nav_msgs_LIBRARIES}
             ${std_msgs_LIBRARIES}
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
@@ -55,7 +54,6 @@ macro(compile_test)
     target_include_directories(${TEST_NAME}
         PRIVATE
             ${geometry_msgs_INCLUDE_DIRS}
-            ${nav_msgs_INCLUDE_DIRS}
             ${std_msgs_INCLUDE_DIRS}
         )
 
@@ -70,7 +68,7 @@ macro(compile_test)
             CXX_STANDARD 17
         )
 
-    add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE})
+    add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE} ENVIRONMENTS ${TEST_ENVIRONMENTS})
 endmacro()
 
 include(CTest)
@@ -78,7 +76,7 @@ include(${IS_GTEST_CMAKE_MODULE_DIR}/gtest.cmake)
 enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
-compile_test(${PROJECT_NAME}_primitive_msgs SOURCE integration/ros2__primitives_msgs.cpp)
+compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp ENVIRONMENTS "ROS2_DISTRO=${IS_ROS2_DISTRO}")
 compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
 if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
@@ -90,11 +88,12 @@ endif()
 set(test_msgs_config_file "ros2__test_msgs.yaml")
 
 set_property(
-    TARGET ${PROJECT_NAME}_geometry_msgs ${PROJECT_NAME}_test_domain ${PROJECT_NAME}_primitive_msgs ${PROJECT_NAME}_test_qos
+    TARGET
+        ${PROJECT_NAME}_check_ros2pkg_creation
+        ${PROJECT_NAME}_geometry_msgs
+        ${PROJECT_NAME}_test_domain
+        ${PROJECT_NAME}_test_qos
     APPEND PROPERTY COMPILE_DEFINITIONS PRIVATE
-        "ROS2__GEOMETRY_MSGS__PUBSUB__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs__pubsub.yaml\""
-        "ROS2__GEOMETRY_MSGS__SERVICES__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__geometry_msgs__services.yaml\""
-        "ROS2__TEST_DOMAIN__TEST_CONFIG=\"${CMAKE_CURRENT_LIST_DIR}/resources/ros2__domain_change.yaml\""
         "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
     )
 
