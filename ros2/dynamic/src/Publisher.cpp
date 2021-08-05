@@ -46,6 +46,7 @@ Publisher::Publisher(
     std::string type_name = message_type.name();
     std::size_t found = type_name.find_last_of("::");
 
+    // packagename::msg::dds_::typename_
     if (found == std::string::npos)
     {
         logger_ << utils::Logger::Level::ERROR
