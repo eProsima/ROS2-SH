@@ -1,0 +1,18 @@
+systems:
+  ros2: { type: ros2 }
+  mock: { type: mock, types-from: ros2 }
+
+routes:
+  mock_to_ros2: { from: mock, to: ros2 }
+  ros2_to_mock: { from: ros2, to: mock }
+
+topics:
+  transmit_pose:
+    type: "geometry_msgs/Pose"
+    route: mock_to_ros2
+    remap: { ros2: { topic: "mock_to_ros2_to_mock" } }
+
+  echo_pose:
+    type: "geometry_msgs/Pose"
+    route: ros2_to_mock
+    remap: { ros2: { topic: "mock_to_ros2_to_mock" } }
