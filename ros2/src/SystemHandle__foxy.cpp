@@ -209,6 +209,11 @@ rclcpp::QoS parse_rmw_qos_configuration(
             qos.liveliness_lease_duration(lease_duration);
         }
     }
+    else
+    {
+        _logger << utils::Logger::Level::INFO
+                << "Creating entity using the default QoS." << std::endl;
+    }
 
     return qos;
 }
@@ -453,6 +458,11 @@ bool SystemHandle::configure(
 
             success = register_type(type_name);
         }
+    }
+
+    if (success)
+    {
+        _logger << utils::Logger::Level::INFO << "Configured!" << std::endl;
     }
 
     return success;
