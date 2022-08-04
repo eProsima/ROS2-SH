@@ -5,8 +5,8 @@
 @# EmPy template for generating is/rosidl/ros2/<package>/include/is/rosidl/ros2/<package>/msg/convert__msg__<msg>.hpp files
 @#
 @# Context:
-@#  - spec (rosidl_parser.MessageSpecification)
-@#    Parsed specification of the .msg file
+@#  - spec (rosidl_adapter.parser.MessageSpecification)
+@#    Parsed specification of the .msg/.idl file
 @#  - subfolder (string)
 @#    The subfolder / subnamespace of the message
 @#    Either 'msg' or 'srv'
@@ -104,27 +104,19 @@ inline const eprosima::xtypes::StructType& type()
 }
 
 //==============================================================================
-inline void convert_to_ros2(const eprosima::xtypes::ReadableDynamicDataRef& from, Ros2_Msg& to)
+inline void convert_to_ros2([[maybe_unused]] const eprosima::xtypes::ReadableDynamicDataRef& from, [[maybe_unused]] Ros2_Msg& to)
 {
 @[for field in alphabetical_fields]@
     utils::Convert<Ros2_Msg::_@(field.name)_type>::from_xtype_field(from["@(field.name)"], to.@(field.name));
 @[end for]@
-
-  // Suppress possible unused variable warnings
-    (void)from;
-    (void)to;
 }
 
 //==============================================================================
-inline void convert_to_xtype(const Ros2_Msg& from, eprosima::xtypes::WritableDynamicDataRef to)
+inline void convert_to_xtype([[maybe_unused]] const Ros2_Msg& from, [[maybe_unused]]eprosima::xtypes::WritableDynamicDataRef to)
 {
 @[for field in alphabetical_fields]@
     utils::Convert<Ros2_Msg::_@(field.name)_type>::to_xtype_field(from.@(field.name), to["@(field.name)"]);
 @[end for]@
-
-  // Suppress possible unused variable warnings
-    (void)from;
-    (void)to;
 }
 
 static eprosima::is::utils::Logger logger ("is::sh::ROS2");

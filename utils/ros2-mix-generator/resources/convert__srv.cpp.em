@@ -5,8 +5,8 @@
 @# EmPy template for generating is/rosidl/ros2/<package>/src/srv/convert__srv__<srv>.cpp files
 @#
 @# Context:
-@#  - spec (rosidl_parser.ServiceSpecification)
-@#    Parsed specification of the .srv file
+@#  - spec (rosidl_adapter.parser.ServiceSpecification)
+@#    Parsed specification of the .srv/.idl file
 @#  - get_header_filename_from_msg_name (function)
 @#######################################################################
 

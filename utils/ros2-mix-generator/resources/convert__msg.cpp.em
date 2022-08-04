@@ -5,8 +5,8 @@
 @# EmPy template for generating is/rosidl/ros2/<package>/src/msg/convert__msg__<msg>.cpp files
 @#
 @# Context:
-@#  - spec (rosidl_parser.MessageSpecification)
-@#    Parsed specification of the .msg file
+@#  - spec (rosidl_adapter.parser.MessageSpecification)
+@#    Parsed specification of the .msg/.idl file
 @#  - subfolder (string)
 @#    The subfolder / subnamespace of the message
 @#    Either 'msg' or 'srv'
