@@ -16,7 +16,7 @@ underscore_srv_type = get_header_filename_from_msg_name(camelcase_srv_type)
 
 cpp_srv_type = '{}::srv::{}'.format(spec.pkg_name, camelcase_srv_type)
 
-srv_type_string = '{}/{}'.format(spec.pkg_name, camelcase_srv_type)
+srv_type_string = '{}/srv/{}'.format(spec.pkg_name, camelcase_srv_type)
 
 namespace_parts_srv = [
     'convert', spec.pkg_name, 'srv', underscore_srv_type]
