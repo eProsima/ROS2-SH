@@ -20,7 +20,7 @@ underscore_msg_type = get_header_filename_from_msg_name(camelcase_msg_type)
 cpp_msg_type = '{}::msg::{}'.format(
       spec.base_type.pkg_name, camelcase_msg_type)
 
-msg_type_string = '{}/{}'.format(
+msg_type_string = '{}/msg/{}'.format(
       spec.base_type.pkg_name, camelcase_msg_type)
 
 header_guard_parts = [

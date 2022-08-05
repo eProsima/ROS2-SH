@@ -14,4 +14,4 @@ routes:
   ros2_to_websocket: { from: ros2, to: websocket }
 
 topics:
-  helloworld: { type: "std_msgs/String", route: websocket_to_ros2, remap: {websocket: {type: std_msgs__String}} }
+  helloworld: { type: "std_msgs/msg/String", route: websocket_to_ros2, remap: {websocket: {type: std_msgs__String}} }
