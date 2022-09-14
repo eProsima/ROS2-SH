@@ -8,15 +8,18 @@ from io import StringIO
 import os
 import sys
 import subprocess
+from pathlib import Path
+
 
 try:
-    from rosidl_adapter.parser import parse_message_file
-    from rosidl_adapter.parser import parse_service_file
+    from rosidl_adapter.parser import parse_message_file, parse_service_file
     from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 
 except ImportError:
     print('Unable to import rosidl_adapter. Please source a ROS2 installation first.', end='', file=sys.stderr)
     sys.exit(1)
+
+from rosidl_parser_ext import parse_idl_to_message_spec, parse_idl_to_service_spec
 
 
 def get_message_type_name(spec):
@@ -27,7 +30,6 @@ def get_message_type_name(spec):
 
 
 def generate_file(template, destination, context):
-
     base_name = template.split('/')[-1]
     base_name_components = base_name.split('.')
 
@@ -50,9 +52,11 @@ def generate_file(template, destination, context):
     with open(output_file_path, 'w') as file:
         file.write(output_buffer.getvalue())
 
+
 def sys_call(command):
     dev_null = open(os.devnull, 'w')
     return subprocess.check_output((command).split(), universal_newlines = True, stderr = dev_null)
+
 
 def find_idl_include_paths():
     environment = sys_call("env")
@@ -65,8 +69,9 @@ def find_idl_include_paths():
                 idl_includes += include + "/share "
             return idl_includes
 
+
 def get_idl_from_file(idl_file, includes):
-    preprocess_cmd = "cpp -H " + includes + " " + idl_file
+    preprocess_cmd = "cpp -H " + includes + " " + str(idl_file)
     unrolled_idl = sys_call(preprocess_cmd)
     idl = ""
     for line in unrolled_idl.splitlines():
@@ -74,14 +79,29 @@ def get_idl_from_file(idl_file, includes):
             idl += line + "\n"
     return idl
 
-def generate_files(package, source_dir, header_dir, idl_files, cpp_files, hpp_files, prefix, parse_fnc):
+
+def generate_files(package, source_dir, header_dir, idl_files, cpp_files, hpp_files, prefix):
     includes = find_idl_include_paths()
     for idl_file in idl_files:
-        idl = get_idl_from_file(idl_file[:-3] + "idl", includes)
+        idl_file = Path(idl_file)
+
+        idl_contents = get_idl_from_file(idl_file.with_suffix('.idl'), includes)
+
+        spec = None
+        if idl_file.suffix == '.idl':
+            if prefix == 'msg':
+                spec = parse_idl_to_message_spec(package, str(idl_file))
+            elif prefix == 'srv':
+                spec = parse_idl_to_service_spec(package, str(idl_file))
+        else:
+            if prefix == 'msg':
+                spec = parse_message_file(package, str(idl_file))
+            elif prefix == 'srv':
+                spec = parse_service_file(package, str(idl_file))
 
         context = {
-            'idl': idl,
-            'spec': parse_fnc(package, idl_file),
+            'idl': idl_contents,
+            'spec': spec,
             'subdir': prefix,
             'get_header_filename_from_msg_name': convert_camel_case_to_lower_case_underscore
         }
@@ -116,11 +136,11 @@ def main(cli_args):
 
     generate_files(args.package, args.source_dir, args.header_dir,
                    args.msg_idl_files, args.msg_cpp_files, args.msg_hpp_files,
-                   'msg', parse_message_file)
+                   'msg')
 
     generate_files(args.package, args.source_dir, args.header_dir,
                    args.srv_idl_files, args.srv_cpp_files, args.srv_hpp_files,
-                   'srv', parse_service_file)
+                   'srv')
 
 
 if __name__ == '__main__':

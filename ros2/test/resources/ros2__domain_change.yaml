@@ -6,4 +6,4 @@ routes:
     domain_5_to_10: { from: ros2_domain5, to: ros2_domain10 }
 
 topics:
-    string_topic: { type: "std_msgs/String", route: domain_5_to_10 }
+    string_topic: { type: "std_msgs/msg/String", route: domain_5_to_10 }

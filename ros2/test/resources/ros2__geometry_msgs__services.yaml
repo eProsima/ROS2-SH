@@ -7,5 +7,5 @@ routes:
   ros2_srv: { server: ros2, clients: mock }
 
 services:
-  get_plan: { type: "nav_msgs/GetPlan:request", route: ros2_srv }
-  echo_plan: { type: "nav_msgs/GetPlan:response", route: mock_srv }
+  get_plan: { type: "nav_msgs/srv/GetPlan:request", route: ros2_srv }
+  echo_plan: { type: "nav_msgs/srv/GetPlan:response", route: mock_srv }

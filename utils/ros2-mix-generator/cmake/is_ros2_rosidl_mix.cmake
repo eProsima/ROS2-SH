@@ -66,12 +66,16 @@ function(is_ros2_rosidl_mix)
         endif()
     endforeach()
 
+    if(NOT Python_EXECUTABLE)
+        find_package(Python COMPONENTS Interpreter)
+    endif()
+
     is_mix_generator(
         IDL_TYPE
             rosidl
         SCRIPT
             INTERPRETER
-                ${PYTHON_EXECUTABLE}
+                ${Python_EXECUTABLE}
             FIND
                 ${CMAKE_CURRENT_LIST_DIR}/scripts/is_ros2_rosidl_find_package_info.py
             GENERATE
