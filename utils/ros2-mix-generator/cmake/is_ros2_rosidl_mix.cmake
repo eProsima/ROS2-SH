@@ -71,7 +71,7 @@ function(is_ros2_rosidl_mix)
             rosidl
         SCRIPT
             INTERPRETER
-                ${PYTHON_EXECUTABLE}
+                ${Python3_EXECUTABLE}
             FIND
                 ${CMAKE_CURRENT_LIST_DIR}/scripts/is_ros2_rosidl_find_package_info.py
             GENERATE
