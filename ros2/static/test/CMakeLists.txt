@@ -55,6 +55,7 @@ macro(compile_test)
 
     target_include_directories(${TEST_NAME}
         PRIVATE
+            ${rclcpp_INCLUDE_DIRS}
             ${geometry_msgs_INCLUDE_DIRS}
             ${nav_msgs_INCLUDE_DIRS}
             ${std_msgs_INCLUDE_DIRS}
