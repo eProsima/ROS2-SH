@@ -294,10 +294,6 @@ whole *Integration Service* product suite, there are some specific flags which a
   ~/is_ws$ colcon build --cmake-args -DBUILD_ROS2_TESTS=ON
   ```
 
-* `IS_ROS2_DISTRO`: This flag is intended to select the *ROS 2* distro that should be used to compile the *ROS 2 System Handle*.
-  If not set, the version will be retrieved from the last *ROS distro* sourced in the compilation environment;
-  this means that if the last *ROS* environment sourced corresponds to *ROS 1*, the compilation process will stop and warn the user about it.
-
 * `IS_ROS2_SH_MODE`: This flag is to decide which *ROS 2 System Handle* mode will be compiled, as the static and dynamic modes are exclusive which means that they cannot be compiled at the same time. It accepts two different values: `static` or `dynamic`.
 
 The following flags are only applicable for the *Static ROS 2 System Handle*:
