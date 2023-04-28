@@ -265,10 +265,6 @@ whole *Integration Service* product suite, there are some specific flags which a
   ~/is_ws$ colcon build --cmake-args -DBUILD_ROS2_TESTS=ON
   ```
 
-* `IS_ROS2_DISTRO`: This flag is intended to select the *ROS 2* distro that should be used to compile the *ROS 2 System Handle*.
-  If not set, the version will be retrieved from the last *ROS distro* sourced in the compilation environment;
-  this means that if the last *ROS* environment sourced corresponds to *ROS 1*, the compilation process will stop and warn the user about it.
-
 * `MIX_ROS_PACKAGES`: It accepts as an argument a list of [ROS packages](https://index.ros.org/packages/),
   such as `std_msgs`, `geometry_msgs`, `sensor_msgs`, `nav_msgs`... for which the required transformation
   library to convert the specific ROS 2 type definitions into *xTypes*, and the other way around, will be built.
