@@ -124,7 +124,7 @@ public:
             ASSERT_EQ(msg_future.wait_for(0s), std::future_status::ready);
             xtypes::DynamicData received_msg = msg_future.get();
 
-            EXPECT_EQ(received_msg.type().name(), "std_msgs/String");
+            EXPECT_EQ(received_msg.type().name(), "std_msgs/msg/String");
 
             xtypes::ReadableDynamicDataRef xtypes_msg = received_msg;
             typename std_msgs::msg::String::_data_type ros2_field;
@@ -165,7 +165,7 @@ TEST_F(ROS2QoS, Durability_Incompatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { durability: TRANSIENT_LOCAL } } }\n";
 
     set_up(yaml);
@@ -188,7 +188,7 @@ TEST_F(ROS2QoS, Durability_Compatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { durability: VOLATILE } } }\n";
 
     set_up(yaml);
@@ -211,7 +211,7 @@ TEST_F(ROS2QoS, Deadline_Incompatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { deadline: { sec: 1 } } } }\n";
 
     set_up(yaml);
@@ -234,7 +234,7 @@ TEST_F(ROS2QoS, Deadline_Compatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { deadline: { sec: 2 } } } }\n";
 
     set_up(yaml);
@@ -257,7 +257,7 @@ TEST_F(ROS2QoS, Liveliness_Incompatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { liveliness: { kind: MANUAL_BY_TOPIC } } } }\n";
 
     set_up(yaml);
@@ -280,7 +280,7 @@ TEST_F(ROS2QoS, Liveliness_Compatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { liveliness: { kind: AUTOMATIC } } } }\n";
 
     set_up(yaml);
@@ -303,7 +303,7 @@ TEST_F(ROS2QoS, Lease_Duration_Incompatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { liveliness: { sec: 1 } } } }\n";
 
     set_up(yaml);
@@ -325,7 +325,7 @@ TEST_F(ROS2QoS, Lease_Duration_Compatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { liveliness: { sec: 3 } } } }\n";
 
     set_up(yaml);
@@ -348,7 +348,7 @@ TEST_F(ROS2QoS, Reliability_Incompatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { reliability: RELIABLE } } }\n";
 
     set_up(yaml);
@@ -371,7 +371,7 @@ TEST_F(ROS2QoS, Reliability_Compatible_QoS)
     yaml += "   mock_to_ros2: { from: mock, to: ros2 }\n";
     yaml += "   ros2_to_mock: { from: ros2, to: mock }\n";
     yaml += "topics:\n";
-    yaml += "   transmit: { type: 'std_msgs/String', route: ros2_to_mock, ";
+    yaml += "   transmit: { type: 'std_msgs/msg/String', route: ros2_to_mock, ";
     yaml += "   ros2: { qos: { reliability: BEST_EFFORT } } }\n";
 
     set_up(yaml);

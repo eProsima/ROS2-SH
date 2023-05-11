@@ -7,5 +7,5 @@ routes:
   ros2_to_mock: { from: ros2, to: mock }
 
 topics:
-  transmit_pose: { type: "geometry_msgs/Pose", route: ros2_to_mock }
-  echo_pose: { type: "geometry_msgs/Pose", route: mock_to_ros2 }
+  transmit_pose: { type: "geometry_msgs/msg/Pose", route: ros2_to_mock }
+  echo_pose: { type: "geometry_msgs/msg/Pose", route: mock_to_ros2 }
