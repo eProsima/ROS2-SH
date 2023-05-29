@@ -27,6 +27,7 @@ find_package(rclcpp REQUIRED)
 
 # Get message dependencies
 find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
 macro(compile_test)
@@ -46,6 +47,7 @@ macro(compile_test)
             is::mock
             ${rclcpp_LIBRARIES}
             ${geometry_msgs_LIBRARIES}
+            ${nav_msgs_LIBRARIES}
             ${std_msgs_LIBRARIES}
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
@@ -53,6 +55,8 @@ macro(compile_test)
 
     target_include_directories(${TEST_NAME}
         PRIVATE
+            ${rclcpp_INCLUDE_DIRS}
+            ${nav_msgs_INCLUDE_DIRS}
             ${geometry_msgs_INCLUDE_DIRS}
             ${std_msgs_INCLUDE_DIRS}
         )
@@ -79,10 +83,10 @@ compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msg
 compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp ENVIRONMENTS "ROS2_DISTRO=${IS_ROS2_DISTRO}")
 compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
-if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
-    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
-else()
+if (rclcpp_VERSION VERSION_GREATER 2.4.2)
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
+else()
+    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
 endif()
 
 set(test_msgs_config_file "ros2__test_msgs.yaml")

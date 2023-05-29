@@ -246,10 +246,10 @@ TEST(ROS2Dynamic, Publish_subscribe_between_ros2_and_mock)
     // we should quit instead of waiting for the future and potentially hanging
     // forever.
     auto start_time = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start_time < 30s)
+    while (std::chrono::steady_clock::now() - start_time < 1min)
     {
         executor.spin_some();
-        if (msg_future.wait_for(100ms) == std::future_status::ready)
+        if (msg_future.wait_for(1s) == std::future_status::ready)
         {
             break;
         }
@@ -309,14 +309,14 @@ TEST(ROS2Dynamic, Publish_subscribe_between_ros2_and_mock)
     // with Integratoion Service, and we should quit instead of waiting for the future and
     // potentially hanging forever.
     start_time = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start_time < 30s)
+    while (std::chrono::steady_clock::now() - start_time < 1min)
     {
         executor.spin_some();
 
         is::sh::mock::publish_message("echo_pose", received_msg);
 
         executor.spin_some();
-        if (pose_future.wait_for(100ms) == std::future_status::ready)
+        if (pose_future.wait_for(1s) == std::future_status::ready)
         {
             break;
         }

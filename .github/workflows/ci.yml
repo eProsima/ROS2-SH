@@ -20,14 +20,14 @@ jobs:
   ros2-sh_CI:
     strategy:
       matrix:
-        ros2_version: [foxy, galactic]
+        ros2_version: [foxy, galactic, humble]
         sh_mode: [static, dynamic]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container: ros:${{ matrix.ros2_version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: src/ros2-sh
 
@@ -38,15 +38,14 @@ jobs:
 
       - name: Download the Integration Service
         run: |
-          git clone --recursive https://github.com/eProsima/xtypes.git -b feature/ros2_sh_dynamic src/xtypes
-          git clone https://github.com/eProsima/Integration-Service -b feature/ros2_dynamic src/integration-service
+          git clone https://github.com/eProsima/Integration-Service -b feature/node-fiware-support src/integration-service
 
       - name: Build
         run: |
-          . /opt/ros/${{ matrix.ros2_version }}/setup.sh
-          colcon build --cmake-args -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ROS2_TESTS=ON -DIS_ROS2_SH_MODE=${{ matrix.sh_mode }} --event-handlers console_direct+
+          /ros_entrypoint.sh colcon build --cmake-args -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ROS2_TESTS=ON -DIS_ROS2_SH_MODE=${{ matrix.sh_mode }} --event-handlers console_direct+
 
       - name: Test
         run: |
-          . /opt/ros/${{ matrix.ros2_version }}/setup.sh && . install/local_setup.sh && RMW_IMPLEMENTATION=rmw_fastrtps_cpp colcon test --packages-select is-ros2 --event-handlers console_direct+
+          . install/setup.sh
+          RMW_IMPLEMENTATION=rmw_fastrtps_cpp colcon test --packages-select is-ros2 --event-handlers console_direct+
           colcon test-result
