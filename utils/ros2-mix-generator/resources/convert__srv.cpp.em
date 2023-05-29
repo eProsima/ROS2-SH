@@ -53,9 +53,6 @@ alphabetical_response_fields = sorted(spec.response.fields, key=lambda x: x.name
 // Include the header for the conversions
 #include <is/utils/Convert.hpp>
 
-// Include the header for the logger
-#include <is/utils/Log.hpp>
-
 // Include the header for the concrete service type
 #include <@(ros2_srv_dependency)>
 
@@ -77,8 +74,6 @@ namespace is {
 namespace sh {
 namespace ros2 {
 namespace @(namespace_variable_srv) {
-
-static eprosima::is::utils::Logger logger ("is::sh::ROS2");
 
 using Ros2_Srv = @(cpp_srv_type);
 using Ros2_Request = Ros2_Srv::Request;
@@ -188,7 +183,6 @@ public:
         : _callback(callback)
         , _handle(std::make_shared<PromiseHolder>())
         , _request_data(request_type())
-        , _service_name(service_name)
     {
         _service = node.create_service<Ros2_Srv>(
             service_name,
@@ -209,11 +203,6 @@ public:
             std::static_pointer_cast<PromiseHolder>(call_handle);
 
         response_to_ros2(result, _response);
-
-        logger << utils::Logger::Level::INFO
-               << "Translating reply from Integration Service to ROS 2 for service reply topic '"
-               << _service_name << "_Reply': [[ " << result << " ]]" << std::endl;
-
         handle->promise->set_value(_response);
     }
 
@@ -224,10 +213,6 @@ private:
             const std::shared_ptr<Ros2_Request>& request,
             const std::shared_ptr<Ros2_Response>& response)
     {
-        logger << utils::Logger::Level::INFO
-               << "Receiving request from ROS 2 for service request topic '"
-               << _service_name << "_Request'" << std::endl;
-
         request_to_xtype(*request, _request_data);
 
         std::promise<Ros2_Response> response_promise;
@@ -252,7 +237,6 @@ private:
     };
 
     ServiceClientSystem::RequestCallback* _callback;
-    std::string _service_name;
     const std::shared_ptr<PromiseHolder> _handle;
     xtypes::DynamicData _request_data;
     Ros2_Response _response;
@@ -303,10 +287,6 @@ public:
         {
             return;
         }
-
-        logger << utils::Logger::Level::INFO
-               << "Translating request from Integration Service to ROS 2 for service request topic '"
-               << _service_name << "_Request': [[ " << request << " ]]" << std::endl;
 
         // This helps the lambda to value-capture the address of the Integration Service client.
         // TODO(MXG): Would it be dangerous for the lambda to reference-capture the

@@ -46,7 +46,6 @@ public:
         , _message_type(message_type)
         , _node(node)
         , _qos_profile(qos_profile)
-        , logger_("is::sh::ROS2::Publisher")
     {
         // Do nothing
     }
@@ -67,10 +66,6 @@ public:
                 _message_type, _node, topic_name, _qos_profile);
         }
 
-        logger_ << utils::Logger::Level::INFO
-            << "Sending message from Integration Service to ROS 2 for topic '" << topic_name
-            << "': [[ " << message << " ]]" << std::endl;
-
         return publisher->publish(message);
     }
 
@@ -80,7 +75,6 @@ private:
     const eprosima::xtypes::DynamicType& _message_type;
     rclcpp::Node& _node;
     const rclcpp::QoS _qos_profile;
-    utils::Logger logger_;
 
     using TopicPublisherPtr = std::shared_ptr<TopicPublisher>;
     using PublisherMap = std::unordered_map<std::string, TopicPublisherPtr>;

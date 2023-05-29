@@ -35,7 +35,6 @@ endif()
 find_package(is-core REQUIRED)
 find_package(rosidl_parser REQUIRED)
 find_package(is-ros2 REQUIRED)
-find_package(Python3 REQUIRED)
 
 list(APPEND MIX_ROS_PACKAGES_LIST std_msgs)
 

@@ -401,12 +401,12 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
 
     // Make sure that we got the expected request message
     auto start_time = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start_time < 1min)
+    while (std::chrono::steady_clock::now() - start_time < 30s)
     {
         executor.spin_some();
         // Note: future_goal gets set after future_start, so waiting on
         // future_goal alone is sufficient for waiting on both.
-        if (future_goal.wait_for(1s) == std::future_status::ready)
+        if (future_goal.wait_for(100ms) == std::future_status::ready)
         {
             break;
         }
@@ -420,10 +420,10 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
     EXPECT_EQ(requested_goal, plan_response.plan.poses.back());
 
     start_time = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start_time < 1min)
+    while (std::chrono::steady_clock::now() - start_time < 30s)
     {
         executor.spin_some();
-        if (future_response_msg.wait_for(1s) == std::future_status::ready)
+        if (future_response_msg.wait_for(100ms) == std::future_status::ready)
         {
             break;
         }
@@ -457,10 +457,10 @@ TEST(ROS2, Request_reply_between_ros2_and_mock)
     // should quit instead of waiting for the future and potentially hanging
     // forever.
     start_time = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - start_time < 1min)
+    while (std::chrono::steady_clock::now() - start_time < 30s)
     {
         executor.spin_some();
-        if (future_response.wait_for(1s) == std::future_status::ready)
+        if (future_response.wait_for(100ms) == std::future_status::ready)
         {
             break;
         }

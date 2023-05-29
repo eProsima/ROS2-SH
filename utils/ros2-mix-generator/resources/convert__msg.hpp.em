@@ -60,9 +60,6 @@ alphabetical_fields = sorted(spec.fields, key=lambda x: x.name)
 // Include the header for the conversions
 #include <is/utils/Convert.hpp>
 
-// Include the header for the logger
-#include <is/utils/Log.hpp>
-
 // Include the header for the concrete ros2 message type
 #include <@(ros2_msg_dependency)>
 
@@ -126,8 +123,6 @@ inline void convert_to_xtype(const Ros2_Msg& from, eprosima::xtypes::WritableDyn
     (void)from;
     (void)to;
 }
-
-static eprosima::is::utils::Logger logger ("is::sh::ROS2");
 
 } //  namespace @(namespace_variable)
 } //  namespace ros2

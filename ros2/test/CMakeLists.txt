@@ -54,7 +54,6 @@ macro(compile_test)
 
     target_include_directories(${TEST_NAME}
         PRIVATE
-            ${rclcpp_INCLUDE_DIRS}
             ${geometry_msgs_INCLUDE_DIRS}
             ${nav_msgs_INCLUDE_DIRS}
             ${std_msgs_INCLUDE_DIRS}
@@ -82,10 +81,10 @@ compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msg
 compile_test(${PROJECT_NAME}_primitive_msgs SOURCE integration/ros2__primitives_msgs.cpp)
 compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
-if (rclcpp_VERSION VERSION_GREATER 2.4.2)
-    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
-else()
+if ("${IS_ROS2_DISTRO}" STREQUAL "foxy")
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
+else()
+    compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
 endif()
 
 set(test_msgs_config_file "ros2__test_msgs.yaml")

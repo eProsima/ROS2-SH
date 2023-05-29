@@ -20,7 +20,7 @@
 ##################################################################################
 cmake_minimum_required(VERSION 3.5.0 FATAL_ERROR)
 
-project(is-ros2 VERSION "3.1.0" LANGUAGES CXX)
+project(is-ros2 VERSION "3.0.0" LANGUAGES CXX)
 
 ###################################################################################
 # Configure options
@@ -44,6 +44,26 @@ endif()
 # External dependencies for the Integration Service ROS 2 SystemHandle library
 ###################################################################################
 if(BUILD_LIBRARY)
+    # Check if the user specified which ROS 2 version he/she is using. If not, warn and try to automatically get it
+    if(NOT IS_ROS2_DISTRO)
+
+        message(WARNING "
+            The variable 'IS_ROS2_DISTRO' was not used. You might want to set it to
+            specify which ROS 2 version should be used to compile the ROS 2 System Handle.
+            By default, a ROS 2 version from the sourced environment will be retrieved automatically.")
+
+            if ("$ENV{ROS_VERSION}" STREQUAL "1")
+                message(FATAL_ERROR "
+                    A ROS 1 version was sourced last in your build environment.
+                    Please use the 'IS_ROS2_VERSION' variable!")
+            else()
+                set(IS_ROS2_DISTRO $ENV{ROS_DISTRO})
+            endif()
+
+    endif()
+
+    message(STATUS "Compiling the ${PROJECT_NAME} System Handle for ROS 2 ${IS_ROS2_DISTRO}...")
+
     find_package(is-core REQUIRED)
     find_package(rclcpp REQUIRED)
 endif()
@@ -55,8 +75,8 @@ if(BUILD_LIBRARY)
     add_library(${PROJECT_NAME}
         SHARED
             src/Factory.cpp
+            $<IF:$<STREQUAL:"${IS_ROS2_DISTRO}","foxy">,src/SystemHandle__foxy.cpp,src/SystemHandle.cpp>
             src/MetaPublisher.cpp
-            $<IF:$<VERSION_GREATER:${rclcpp_VERSION},2.4.2>,src/SystemHandle.cpp,src/SystemHandle__foxy.cpp>
         )
 
     if (Sanitizers_FOUND)
