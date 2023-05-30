@@ -37,28 +37,40 @@ macro(compile_test)
     else()
         set(TEST_NAME "${ARGV0}")
     endif()
+    set(options NO_ROS_DEPENDENCIES)
     set(multiValueArgs SOURCE ENVIRONMENTS)
-    cmake_parse_arguments(TEST "" "${uniValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(TEST "${options}" "${uniValueArgs}" "${multiValueArgs}" ${ARGN})
 
     add_executable(${TEST_NAME} ${TEST_SOURCE})
 
-    target_link_libraries(${TEST_NAME}
-        PUBLIC
-            is::mock
+    if(NOT TEST_NO_ROS_DEPENDENCIES)
+        set(link_dependencies
             ${rclcpp_LIBRARIES}
             ${geometry_msgs_LIBRARIES}
             ${nav_msgs_LIBRARIES}
             ${std_msgs_LIBRARIES}
+            )
+
+        set(include_dependencies
+            ${rclcpp_INCLUDE_DIRS}
+            ${nav_msgs_INCLUDE_DIRS}
+            ${geometry_msgs_INCLUDE_DIRS}
+            ${std_msgs_INCLUDE_DIRS}
+            )
+    endif()
+
+    target_link_libraries(${TEST_NAME}
+        PUBLIC
+            is::mock
+            is-ros2-distro
+            ${link_dependencies}
         PRIVATE
             $<IF:$<BOOL:${IS_GTEST_EXTERNAL_PROJECT}>,libgtest,gtest>
     	)
 
     target_include_directories(${TEST_NAME}
         PRIVATE
-            ${rclcpp_INCLUDE_DIRS}
-            ${nav_msgs_INCLUDE_DIRS}
-            ${geometry_msgs_INCLUDE_DIRS}
-            ${std_msgs_INCLUDE_DIRS}
+            ${include_dependencies}
         )
 
     target_compile_options(${TEST_NAME}
@@ -67,12 +79,20 @@ macro(compile_test)
             $<$<CXX_COMPILER_ID:GNU>:-Wextra>
         )
 
+    target_compile_definitions(${TEST_NAME}
+        PRIVATE
+            "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
+        )
+
     set_target_properties(${TEST_NAME}
         PROPERTIES
             CXX_STANDARD 17
         )
 
-    add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE} ENVIRONMENTS ${TEST_ENVIRONMENTS})
+    add_gtest(${TEST_NAME} SOURCES ${TEST_SOURCE})
+
+    unset(link_dependencies)
+    unset(include_dependencies)
 endmacro()
 
 include(CTest)
@@ -80,7 +100,9 @@ include(${IS_GTEST_CMAKE_MODULE_DIR}/gtest.cmake)
 enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
-compile_test(${PROJECT_NAME}_check_ros2pkg_creation SOURCE integration/check_ros2pkg_creation.cpp ENVIRONMENTS "ROS2_DISTRO=${IS_ROS2_DISTRO}")
+compile_test(${PROJECT_NAME}_check_ros2pkg_creation
+        NO_ROS_DEPENDENCIES
+        SOURCE integration/check_ros2pkg_creation.cpp)
 compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
 if (rclcpp_VERSION VERSION_GREATER 2.4.2)
@@ -88,18 +110,6 @@ if (rclcpp_VERSION VERSION_GREATER 2.4.2)
 else()
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
 endif()
-
-set(test_msgs_config_file "ros2__test_msgs.yaml")
-
-set_property(
-    TARGET
-        ${PROJECT_NAME}_check_ros2pkg_creation
-        ${PROJECT_NAME}_geometry_msgs
-        ${PROJECT_NAME}_test_domain
-        ${PROJECT_NAME}_test_qos
-    APPEND PROPERTY COMPILE_DEFINITIONS PRIVATE
-        "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
-    )
 
 # Windows dll dependencies installation
 if(WIN32)

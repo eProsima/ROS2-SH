@@ -46,7 +46,7 @@ if(ENV{ROS_DISTRO})
 else()
     find_package(ros_environment REQUIRED)
 
-    file(GLOB_RECURSE hook_files "${ros_environment_DIR}/../*ros_distro.sh" "${ros_environment_DIR}/../*ros_distro.bat") 
+    file(GLOB_RECURSE hook_files "${ros_environment_DIR}/../*ros_distro.sh" "${ros_environment_DIR}/../*ros_distro.bat")
     file(STRINGS ${hook_files} export_statement REGEX "ROS_DISTRO=")
     string(REGEX MATCH "ROS_DISTRO=(.*)" hook_files "${export_statement}")
     unset(hook_files)
@@ -57,13 +57,22 @@ endif()
 
 # Generate the config.hpp file
 configure_file(${PROJECT_SOURCE_DIR}/config.hpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/include/config.hpp
+    ${CMAKE_CURRENT_BINARY_DIR}/include/is/sh/ros2/config.hpp
     )
 
 include(GNUInstallDirs)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/config.hpp
-    DESTINATION	${CMAKE_INSTALL_INCLUDEDIR}/is/sh/ros2  
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/is/sh/ros2/config.hpp
+    DESTINATION	${CMAKE_INSTALL_INCLUDEDIR}/is/sh/ros2
+    )
+
+# Use an interface target to distribute the distro dependency
+add_library(is-ros2-distro INTERFACE)
+
+target_include_directories(is-ros2-distro
+    INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
 
 # install the headers
@@ -126,14 +135,13 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         is::core
         fastrtps
+        is-ros2-distro
     )
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>  
     )
 
 ###################################################################################
@@ -144,6 +152,8 @@ is_install_middleware_plugin(
         ros2_dynamic
     TARGET
         ${PROJECT_NAME}
+    INTERFACES
+        is-ros2-distro
     )
 
 file(
