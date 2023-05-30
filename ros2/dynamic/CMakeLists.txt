@@ -150,7 +150,7 @@ file(
     COPY
         ${CMAKE_CURRENT_LIST_DIR}/resources/
     DESTINATION
-        /tmp/
+        /tmp/is_ros2_sh
 )
 
 ###################################################################################

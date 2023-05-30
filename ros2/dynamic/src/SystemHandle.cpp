@@ -675,7 +675,7 @@ public:
                                     << std::endl;
 
                             // Then compound the whose command to call the generator.bash
-                            std::string command = "exec bash /tmp/generator.bash " + package_name + " " + path + " " + depends;
+                            std::string command = "exec bash /tmp/is_ros2_sh/generator.bash " + package_name + " " + path + " " + depends;
 
                             logger_ << utils::Logger::Level::DEBUG
                                     << "Command: " << command << std::endl;

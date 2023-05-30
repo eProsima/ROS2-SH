@@ -20,9 +20,9 @@ for pkg in $package_name; do
 
   echo "Generating Type Support for package $pkg with dependencies ${!pkg}";
 
-  cp /tmp/CMakeLists.txt /tmp/$pkg/
+  cp /tmp/is_ros2_sh/CMakeLists.txt /tmp/$pkg/
 
-  sed "s#<name>\([^<][^<]*\)</name>#<name>$pkg</name>#" /tmp/package.xml > /tmp/$pkg/package.xml
+  sed "s#<name>\([^<][^<]*\)</name>#<name>$pkg</name>#" /tmp/is_ros2_sh/package.xml > /tmp/$pkg/package.xml
 
   cd /tmp/$pkg
 
