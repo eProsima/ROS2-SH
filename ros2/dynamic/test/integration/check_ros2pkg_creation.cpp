@@ -103,7 +103,7 @@ public:
 
         std::ostringstream command;
         command << ". /opt/ros/" << ROS2_DISTRO << "/setup.sh && ros2 topic pub /test ";
-        command << "custom_msgs/msg/Message \"{text: {data: 'thisisatest'}}\" --once";
+        command << "custom_msgs/msg/Message \"{text: {data: 'thisisatest'}}\" --once" WAIT;
 
         FILE* pipe = popen(command.str().c_str(), "r");
         if (!pipe)

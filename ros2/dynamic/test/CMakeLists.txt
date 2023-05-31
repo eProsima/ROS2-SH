@@ -38,7 +38,7 @@ macro(compile_test)
         set(TEST_NAME "${ARGV0}")
     endif()
     set(options NO_ROS_DEPENDENCIES)
-    set(multiValueArgs SOURCE ENVIRONMENTS)
+    set(multiValueArgs SOURCE ENVIRONMENTS PREPROCESSOR)
     cmake_parse_arguments(TEST "${options}" "${uniValueArgs}" "${multiValueArgs}" ${ARGN})
 
     add_executable(${TEST_NAME} ${TEST_SOURCE})
@@ -79,9 +79,14 @@ macro(compile_test)
             $<$<CXX_COMPILER_ID:GNU>:-Wextra>
         )
 
+    if(TEST_PREPROCESSOR)
+        string(REPLACE ";" " " preprocessor_definitions "${TEST_PREPROCESSOR}")
+    endif()
+
     target_compile_definitions(${TEST_NAME}
         PRIVATE
             "ROS2__ROSIDL__BUILD_DIR=\"${CMAKE_BINARY_DIR}/is/rosidl/ros2/lib\""
+            ${preprocessor_definitions}
         )
 
     set_target_properties(${TEST_NAME}
@@ -93,6 +98,7 @@ macro(compile_test)
 
     unset(link_dependencies)
     unset(include_dependencies)
+    unset(preprocessor_definitions)
 endmacro()
 
 include(CTest)
@@ -100,9 +106,6 @@ include(${IS_GTEST_CMAKE_MODULE_DIR}/gtest.cmake)
 enable_testing()
 
 compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msgs.cpp)
-compile_test(${PROJECT_NAME}_check_ros2pkg_creation
-        NO_ROS_DEPENDENCIES
-        SOURCE integration/check_ros2pkg_creation.cpp)
 compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
 if (rclcpp_VERSION VERSION_GREATER 2.4.2)
@@ -110,6 +113,23 @@ if (rclcpp_VERSION VERSION_GREATER 2.4.2)
 else()
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
 endif()
+
+# Check if this version of ros forces wait for subscription
+execute_process(
+    COMMAND bash -c ". /opt/ros/${IS_ROS2_DISTRO}/setup.bash && ros2 topic pub --help"
+    OUTPUT_VARIABLE ROS2_PUB_HELP
+    )
+
+if(ROS2_PUB_HELP MATCHES WAIT_MATCHING_SUBSCRIPTIONS)
+    set(WAIT "WAIT=\" -w 0\"")
+else()
+    set(WAIT "WAIT=\"\"")
+endif()
+
+compile_test(${PROJECT_NAME}_check_ros2pkg_creation
+        NO_ROS_DEPENDENCIES
+        PREPROCESSOR ${WAIT}
+        SOURCE integration/check_ros2pkg_creation.cpp)
 
 # Windows dll dependencies installation
 if(WIN32)
