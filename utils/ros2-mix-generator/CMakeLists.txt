@@ -26,8 +26,16 @@ project(is-ros2-mix-generator)
 # Configure options
 ###################################################################################
 option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+set(IS_ROS2_SH_MODE "Static" CACHE STRING "Select the ROS 2 SystemHandle Mode")
 
 if(NOT BUILD_LIBRARY)
+    return()
+endif()
+
+set(IS_ROS2_SH_MODE_LOWERCASE "" CACHE STRING "Build mode to lowercase")
+string(TOLOWER "${IS_ROS2_SH_MODE}" IS_ROS2_SH_MODE_LOWERCASE)
+
+if("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "dynamic")
     return()
 endif()
 
@@ -92,12 +100,6 @@ is_ros2_rosidl_mix(
     PACKAGES ${MIX_ROS_PACKAGES_LIST}
     MIDDLEWARES ros2
 )
-
-find_program(NODERED_EXECUTABLE NAMES node-red node-red@ PATH_SUFFIXES bin)
-
-if(NODERED_EXECUTABLE)
-    file(WRITE $ENV{HOME}/rosidl_msgs_path.txt "${CMAKE_INSTALL_PREFIX}/lib/is/ros2/msg\n${CMAKE_INSTALL_PREFIX}/include/is/rosidl/ros2")
-endif()
 
 # Install Config.cmake file
 install(

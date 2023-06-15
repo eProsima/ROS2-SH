@@ -26,124 +26,26 @@ project(is-ros2 VERSION "3.1.0" LANGUAGES CXX)
 # Configure options
 ###################################################################################
 option(BUILD_LIBRARY "Compile the ROS 2 SystemHandle" ON)
+set(IS_ROS2_SH_MODE "Static" CACHE STRING "Select the ROS 2 SystemHandle Mode")
 
 ###################################################################################
-# Load external CMake Modules.
+# Build ROS2 Static SH or ROS2 Dynamic SH
 ###################################################################################
-if(BUILD_LIBRARY)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SANITIZERS_ROOT}/cmake)
+set(IS_ROS2_SH_MODE_LOWERCASE "" CACHE STRING "Build mode to lowercase")
+string(TOLOWER "${IS_ROS2_SH_MODE}" IS_ROS2_SH_MODE_LOWERCASE)
 
-    find_package(Sanitizers QUIET)
-
-    if(SANITIZE_ADDRESS)
-        message(STATUS "Preloading AddressSanitizer library could be done using \"${ASan_WRAPPER}\" to run your program.")
-    endif()
-endif()
-
-###################################################################################
-# External dependencies for the Integration Service ROS 2 SystemHandle library
-###################################################################################
-if(BUILD_LIBRARY)
-    find_package(is-core REQUIRED)
-    find_package(rclcpp REQUIRED)
-endif()
-
-###################################################################################
-# Configure the Integration Service ROS 2 SystemHandle library
-###################################################################################
-if(BUILD_LIBRARY)
-    add_library(${PROJECT_NAME}
-        SHARED
-            src/Factory.cpp
-            src/MetaPublisher.cpp
-            $<IF:$<VERSION_GREATER:${rclcpp_VERSION},2.4.2>,src/SystemHandle.cpp,src/SystemHandle__foxy.cpp>
-        )
-
-    if (Sanitizers_FOUND)
-        add_sanitizers(${PROJECT_NAME})
-    endif()
-
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        VERSION
-            ${PROJECT_VERSION}
-        SOVERSION
-            ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-        CXX_STANDARD
-            17
-        CXX_STANDARD_REQUIRED
-            YES
-        )
-
-    target_compile_options(${PROJECT_NAME}
-        PRIVATE
-            $<$<CXX_COMPILER_ID:GNU>:-pedantic>
-            $<$<CXX_COMPILER_ID:GNU>:-fstrict-aliasing>
-            $<$<CXX_COMPILER_ID:GNU>:-Wall>
-            $<$<CXX_COMPILER_ID:GNU>:-Wextra>
-            $<$<CXX_COMPILER_ID:GNU>:-Wcast-align>
-            $<$<CXX_COMPILER_ID:GNU>:-Wshadow>
-            $<$<CXX_COMPILER_ID:MSVC>:/W4>
-            $<$<CXX_COMPILER_ID:MSVC>:/wd4700>
-            $<$<CXX_COMPILER_ID:MSVC>:/wd4996>
-            $<$<CXX_COMPILER_ID:MSVC>:/wd4820>
-            $<$<CXX_COMPILER_ID:MSVC>:/wd4255>
-            $<$<CXX_COMPILER_ID:MSVC>:/wd4668>
-        )
-
-    include(GNUInstallDirs)
-    message(STATUS "Configuring [${PROJECT_NAME}]...")
-
-    target_link_libraries(${PROJECT_NAME}
-        PUBLIC
-            is::core
-            ${rclcpp_LIBRARIES}
-        )
-
-    target_include_directories(${PROJECT_NAME}
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-            ${rclcpp_INCLUDE_DIRS}
-        )
-
-    is_generate_export_header(ros2)
-
-    if (NOT rosidl_runtime_cpp_FOUND)
-        target_compile_definitions(${PROJECT_NAME}
-            PUBLIC
-                "IS_SH_ROS2__ROSIDL_GENERATOR_CPP"
-        )
-    endif()
-endif()
-
-###################################################################################
-# Install the Integration Service ROS 2 SystemHandle library
-###################################################################################
-if(BUILD_LIBRARY)
-    is_install_middleware_plugin(
-        MIDDLEWARE
-            ros2
-        TARGET
-            ${PROJECT_NAME}
-        DEPENDENCIES
-            rclcpp
-        )
-
-    file(
-        COPY
-            ${CMAKE_CURRENT_LIST_DIR}/include/
-        DESTINATION
-            ${CMAKE_INSTALL_PREFIX}/include/
-    )
-endif()
-
-###################################################################################
-# Integration Service ROS 2 SystemHandle tests
-###################################################################################
-if(BUILD_LIBRARY)
+if("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "static")
+    add_subdirectory(static)
     if(BUILD_TESTS OR BUILD_ROS2_TESTS)
-        add_subdirectory(test)
+        enable_testing()
     endif()
+elseif("${IS_ROS2_SH_MODE_LOWERCASE}" STREQUAL "dynamic")
+    add_subdirectory(dynamic)
+    if(BUILD_TESTS OR BUILD_ROS2_TESTS)
+        enable_testing()
+    endif()
+else()
+    message(WARNING "Invalid mode selected. Please choose between 'static' or 'dynamic'")
 endif()
 
 ###################################################################################
@@ -160,14 +62,16 @@ if(BUILD_API_REFERENCE)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/doxygen/html
         COMMENT "Creating documentation directories" VERBATIM)
 
-    set(IS_ROS2_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include/is/sh/ros2")
-    set(IS_ROS2_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
+    set(IS_ROS2_STATIC_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/static/include/is/sh/ros2")
+    set(IS_ROS2_STATIC_SOURCE_DIR "${CMAKE_SOURCE_DIR}/static/src")
+    set(IS_ROS2_DYNAMIC_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/dynamic/include/is/sh/ros2")
     file(GLOB_RECURSE HPP_FILES
-        "${IS_ROS2_INCLUDE_DIR}/*.h*"
-        "${IS_ROS2_SOURCE_DIR}/*.h*")
+        "${IS_ROS2_STATIC_INCLUDE_DIR}/*.h*"
+        "${IS_ROS2_STATIC_SOURCE_DIR}/*.h*"
+        "${IS_ROS2_DYNAMIC_INCLUDE_DIR}/*.h*")
 
     # Doxygen related variables
-    set(DOXYGEN_INPUT_DIR "${IS_ROS2_INCLUDE_DIR} ${IS_ROS2_SOURCE_DIR}")
+    set(DOXYGEN_INPUT_DIR "${IS_ROS2_STATIC_INCLUDE_DIR} ${IS_ROS2_STATIC_SOURCE_DIR} ${IS_ROS2_DYNAMIC_INCLUDE_DIR}")
     set(DOXYGEN_OUTPUT_DIR "${PROJECT_BINARY_DIR}/doxygen")
     set(DOXYGEN_INDEX_FILE "${PROJECT_BINARY_DIR}/doxygen/xml/index.xml")
     set(DOXYFILE_IN "${IS_DOXYGEN_CONFIG_FILE}")
@@ -195,8 +99,8 @@ if(BUILD_API_REFERENCE)
     install(DIRECTORY ${PROJECT_BINARY_DIR}/doxygen/xml
         DESTINATION doxygen
         COMPONENT doxygen-${PROJECT_NAME})
-    set(CPACK_COMPONENT_EXAMPLES_DISPLAY_NAME "ROS2 System Handle doxygen")
+    set(CPACK_COMPONENT_EXAMPLES_DISPLAY_NAME "ROS2 System Handles doxygen")
     set(CPACK_COMPONENT_EXAMPLES_DESCRIPTION
-        "eProsima ROS2 System Handle doxygen documentation")
+        "eProsima ROS2 System Handles doxygen documentation")
     set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} doxygen-${PROJECT_NAME})
 endif()
