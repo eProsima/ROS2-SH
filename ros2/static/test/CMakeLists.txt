@@ -83,7 +83,7 @@ compile_test(${PROJECT_NAME}_geometry_msgs SOURCE integration/ros2__geometry_msg
 compile_test(${PROJECT_NAME}_primitive_msgs SOURCE integration/ros2__primitives_msgs.cpp)
 compile_test(${PROJECT_NAME}_test_qos SOURCE integration/ros2__test_qos.cpp)
 
-if (rclcpp_VERSION VERSION_GREATER 2.4.2)
+if (rclcpp_VERSION VERSION_GREATER_EQUAL 2.5)
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain.cpp)
 else()
     compile_test(${PROJECT_NAME}_test_domain SOURCE integration/ros2__test_domain__foxy.cpp)
