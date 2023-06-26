@@ -54,7 +54,7 @@ add_library(${PROJECT_NAME}
     SHARED
         src/Factory.cpp
         src/MetaPublisher.cpp
-        $<IF:$<VERSION_GREATER:${rclcpp_VERSION},2.4.2>,src/SystemHandle.cpp,src/SystemHandle__foxy.cpp>
+        $<IF:$<VERSION_GREATER_EQUAL:${rclcpp_VERSION},2.5>,src/SystemHandle.cpp,src/SystemHandle__foxy.cpp>
     )
 
 if (Sanitizers_FOUND)
